@@ -258,12 +258,12 @@ static void *bma250_input_read(void *arg)
 
 	fd = d->select_worker.get_fd(&d->select_worker);
 
-	n = read(fd, events, sizeof(events)) / sizeof(events[0]);
+	n = read(fd, events, sizeof(events));
 	if (n < 0) {
 		ALOGE("%s: read error from fd %d, errno %d", __func__, fd, errno);
 		goto exit;
 	}
-
+	n = n / sizeof(events[0]);
 	for (i = 0; i < n; i++) {
 		e = events + i;
 		switch (e->type) {
