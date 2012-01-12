@@ -235,8 +235,6 @@ static int apds9700_init(struct sensor_api_t *s)
 			PROXIMITY_DEV_NAME);
 		return fd;
 	}
-	apds9700_init_threshold_members(d, fd);
-	apds9700_init_burst_members(d, fd);
 	close(fd);
 
 	sensors_select_init(&d->select_worker, apds9700_read, s, -1);
@@ -256,6 +254,8 @@ static int apds9700_activate(struct sensor_api_t *s, int enable)
 				PROXIMITY_DEV_NAME);
 			return fd;
 		}
+		apds9700_init_threshold_members(d, fd);
+		apds9700_init_burst_members(d, fd);
 		d->select_worker.set_fd(&d->select_worker, fd);
 		d->select_worker.resume(&d->select_worker);
 	} else if (!enable && (fd > 0)) {
