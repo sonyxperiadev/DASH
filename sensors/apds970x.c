@@ -33,6 +33,7 @@
 #define BURST_DEFAULT    1
 #define BURST_THRESHOLD_MIN 2
 #define PATH_SIZE      100
+#define UN_INIT         -1
 
 static int apds9700_init(struct sensor_api_t *s);
 static int apds9700_activate(struct sensor_api_t *s, int enable);
@@ -73,13 +74,18 @@ static struct sensor_desc apds970x = {
 		.activate = apds9700_activate,
 		.set_delay = apds9700_set_delay,
 		.close = apds9700_close
-	}
+	},
+	.th_not_det = UN_INIT,
+	.burst_not_det = UN_INIT,
 };
 
 static void apds9700_init_threshold_members(struct sensor_desc *d, int fd_input)
 {
 	char buf[PATH_SIZE];
 	int fd_th;
+
+	if (d->th_not_det != UN_INIT)
+		return;
 
 	if (ioctl(fd_input, EVIOCGPHYS(sizeof(buf)), buf) < 0 ||
 	    snprintf(d->th_path, sizeof(d->th_path), "%s/threshold", buf) < 0) {
@@ -120,6 +126,9 @@ static void apds9700_init_burst_members(struct sensor_desc *d, int fd_input)
 	char buf[PATH_SIZE];
 	int fd_burst;
 	int requested_burst;
+
+	if (d->burst_not_det != UN_INIT)
+		return;
 
 	if (ioctl(fd_input, EVIOCGPHYS(sizeof(buf)), buf) < 0 ||
 	    snprintf(d->burst_path, sizeof(d->burst_path),
