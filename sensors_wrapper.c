@@ -165,44 +165,52 @@ int sensors_wrapper_init(struct sensor_api_t *s)
 {
 	struct wrapper_desc *d = container_of(s, struct wrapper_desc, api);
 	int i;
-	int m;
-	int init;
-	int rv = 0;
+	int err = -1;
 
 	LOCK(&wrapper_mutex);
+scan:
 	for (i = 0; i < idx; i++) {
-		for (m = 0; m < d->access.m_nr; m++) {
-			if (list[i].sensor->type == d->access.match[m]) {
-				d->access.sensor[d->access.nr] = i;
-				d->access.client[d->access.nr] =
-							list[i].entry->nr;
+		if (list[i].sensor->type == d->access.match[d->access.nr]) {
+			int init, rv = 0;
+			ALOGV("%s: matched '%s' and '%s'", __func__,
+				d->sensor.name, list[i].sensor->name);
 
-				init = list_get_status(i, INIT);
+			d->access.sensor[d->access.nr] = i;
+			d->access.client[d->access.nr] = list[i].entry->nr;
 
-				if (!init)
-					rv = list[i].api->init(list[i].api);
+			init = list_get_status(i, INIT);
+			if (!init)
+				rv = list[i].api->init(list[i].api);
 
-				if (rv < 0) {
-					ALOGE("%s: Error %s init failed",
-					__func__, list[i].sensor->name);
-				} else {
-					list_set_status(
-						d->access.sensor[d->access.nr],
-						d->access.client[d->access.nr],
-						INIT);
-				}
+			if (rv < 0) {
+				ALOGE("%s: '%s' init failed, continue search",
+				__func__, list[i].sensor->name);
+				err = rv;
+			} else {
+				list_set_status(
+					d->access.sensor[d->access.nr],
+					d->access.client[d->access.nr],
+					INIT);
+
 				list_set_api(d->access.sensor[d->access.nr],
 						d->access.client[d->access.nr],
 						&d->api);
 
 				list[i].entry->nr++;
 				d->access.nr++;
+
+				if (d->access.nr != d->access.m_nr) {
+					goto scan;
+				} else {
+					err = 0;
+					break;
+				}
 			}
 		}
 	}
 	UNLOCK(&wrapper_mutex);
 
-	return rv;
+	return err;
 }
 
 /* perfom activate for all sensors included in the access field, but it will
