@@ -79,8 +79,8 @@ static struct sensor_desc accelerometer = {
 	.dev_modes = {
 		[MODE_FASTEST] = "poll",
 		[MODE_GAME]    = "poll",
-		[MODE_UI]      = "irq",
-		[MODE_NORMAL]  = "irq",
+		[MODE_UI]      = "poll",
+		[MODE_NORMAL]  = "poll",
 	},
 };
 #else
