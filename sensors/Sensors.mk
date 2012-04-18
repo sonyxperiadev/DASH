@@ -63,6 +63,11 @@ $(yes-var-compass-ak896xna)-files += ak896xna.c wrappers/ak896xna_sensors.c
 #
 # Light sensors
 #
+$(SOMC_CFG_SENSORS_LIGHT_LIBALS)-files += light_sensor_als.c
+$(SOMC_CFG_SENSORS_LIGHT_LIBALS)-c-includes += $(DASH_ROOT)/libs/libals
+$(SOMC_CFG_SENSORS_LIGHT_LIBALS)-shared-libs += libals
+$(SOMC_CFG_SENSORS_LIGHT_LIBALS)-var-set-light-range = yes
+
 $(SOMC_CFG_SENSORS_SYSTEM_WIDE_ALS)-files += sys_als.c
 $(SOMC_CFG_SENSORS_SYSTEM_WIDE_ALS)-c-includes += $(DASH_ROOT)/libs/libals
 $(SOMC_CFG_SENSORS_SYSTEM_WIDE_ALS)-shared-libs += liblights-core
