@@ -25,6 +25,15 @@ $(yes-var-compass-lsm303dlh)-var-xyz = yes
 #
 # Compasses
 #
+$(SOMC_CFG_SENSORS_COMPASS_AK8963)-var-compass-ak896xna = yes
+$(SOMC_CFG_SENSORS_COMPASS_AK8963)-cflags += -DAK8963 \
+					     -DAKM_CHIP_NAME="\"AK8963\"" \
+					     -DAKM_CHIP_MAXRANGE=4900 \
+					     -DAKM_CHIP_RESOLUTION=60 \
+					     -DAKM_CHIP_POWER=0.4
+$(SOMC_CFG_SENSORS_COMPASS_AK8963)-c-includes += $(DASH_ROOT)/libs/akm8963
+$(SOMC_CFG_SENSORS_COMPASS_AK8963)-shared-libs += libsensors_akm8963
+
 $(SOMC_CFG_SENSORS_COMPASS_AK8972)-var-compass-ak897xna = yes
 $(SOMC_CFG_SENSORS_COMPASS_AK8972)-cflags += -DAK8972 \
 					     -DAKM_CHIP_NAME="\"AK8972\"" \
@@ -49,6 +58,7 @@ $(SOMC_CFG_SENSORS_COMPASS_AK8975)-cflags += -DAK8975 \
 
 $(yes-var-compass-ak897x)-files   += ak897x.c
 $(yes-var-compass-ak897xna)-files += ak897xna.c wrappers/ak897xna_sensors.c
+$(yes-var-compass-ak896xna)-files += ak896xna.c wrappers/ak896xna_sensors.c
 
 #
 # Light sensors
