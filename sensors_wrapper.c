@@ -23,7 +23,7 @@
 #include "sensor_util.h"
 #include "sensors_wrapper.h"
 
-#define NO_RATE		0xFFFFFFFF
+#define NO_RATE		(-1)
 #define UNUSED		0
 #define CLOSE		0x1
 #define INIT		0x2
@@ -83,7 +83,8 @@ static int64_t list_get_rate(int sensor)
 	int64_t rate = NO_RATE;
 
 	for (j = 0; j < list[sensor].entry->nr; j++) {
-		if (list[sensor].entry->rate[j] < rate)
+		if ((list[sensor].entry->rate[j] >= 0) &&
+			(list[sensor].entry->rate[j] < (uint64_t)rate))
 			rate = list[sensor].entry->rate[j];
 	}
 
