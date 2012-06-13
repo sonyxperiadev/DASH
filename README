@@ -1,0 +1,154 @@
+		Dynamic Android Sensor HAL
+		      D * A * S * H
+
+Copyright (C) Sony Mobile Communication 2012
+
+
+Table of contents
+-----------------
+
+1 ............ Description
+2 ............ File overview
+3 ............ License
+
+
+1 Motivation
+------------
+
+This sensor HAL implementation makes it possible to use one generic piece
+of code to satisfy multiple product requirements. By adding the possibility
+to enable sensors at compile-time it's simply a matter of specifying which
+sensors the product uses.
+
+The implementation also adds support for configuring the sensors at run-time
+using a configuration file. This makes it possible to, e.g. setting PCB mounting
+coordinates of the sensors.
+
+The DASH is the only sensor HAL implementation that is needed and hence the
+maintenance work is kept to a minimal.
+
+
+2 File overview
+---------------
+
+2.1 Control
+File: sensors_module.c
+
+This file implements the sensor HAL interface. It traverses the enabled sensors
+and routes incoming requests to the right sensor.
+
+
+2.2 Sensor list
+File: sensors_list.c
+
+Each sensor registers to this list at linking of the library using gcc
+constructors. This makes it possible to decide at compile-time which sensors
+should be supported.
+
+The module provides an interface for fetching and iterating over sensors.
+
+
+2.3 Sensor API
+File: sensor_api.h
+
+This defines the abstraction of a sensor. A sensor supports: init, activate,
+set_delay and close.
+
+
+2.4 Sensor implementations
+File: sensors/*.c
+
+Each sensor is an implementation of the sensor abstraction (see Sensor API).
+
+At startup of the library each sensor implementation has to register to the
+sensor list (see Sensor list). This is done using the macro list_constructor().
+
+Each sensor implementation will create a thread using either a sensor worker
+(see Polling sensor) or a select thread (see Interrupt driven sensor).
+
+When data has been collected it is written to the fifo by issuing a
+sensors_fifo_put-call.
+
+In the file sensor_util.c some generic helper functions have been gathered.
+
+
+2.5 Polling sensor
+File: sensors_worker.c
+
+A polling sensor implementation has to own its own thread since each sensor
+can run at a different poll rate. A thread is created by instanciating a sensor
+worker using sensors_worker_init().
+
+The sensors_worker will then call the provided work_func at the delay specified
+by the set_delay()-call.
+
+
+2.6 Interrupt driven sensor
+File: sensors_select.c
+
+An interrupt driven sensor can report data when it gets an interrupt that there
+is new data to be collected. This can save some clock cycles and battery time.
+
+By instanciating a sensors_select-worker by calling sensors_select_init(), one
+will get a call to the select_func when there is new data to be read on the
+provided file descriptor.
+
+
+2.7 Sensor config
+File: sensors_config.c
+
+This module can be used by the sensor implementations to read configuration
+parameters from a file.
+
+Each parameter should have the following format:
+<sensor name>_<parameter name> = <value>
+
+A sensor implementation reads out the value with the function
+sensors_config_get_key().
+
+
+2.8 Some utilitiy stuff
+File: sensors/sensor_util.c
+
+In the file sensor_util there are some code to be used by the sensor
+implementations. It contains code for transforming coordinates and some
+functions for reading time.
+
+
+2.9 Vendor libraries
+Directory: libs/
+
+Some sensors need vendor libraries to calibrate their output. These will
+put in the libs directory.
+
+
+2.10 ASCII Design
+
+       A N D R O I D
+------------------------------------------------------------
+			  |
+                   +---------------+
+		   | sensors_module|
+		   +---------------+
+		          |
+		     +------------+
+		     |sensors_list|
+		     +------------+		 +--------+
+		      /          \ 		 | Vendor |
+		  +--------+       +--------+	 | libs   |
+		  |sensor 1|  ...  |sensor N| -- |	  |
+		  +--------+       +--------+    |	  |
+		      |                |	 +--------+
+------------------------------------------------------------
+       L I N U X
+
+		+------------+       +------------+
+		|sensor dev 1|  ...  |sensor dev N|
+		+------------+       +------------+
+
+
+3 License
+---------
+
+The license for all code in this project is specified in the LICENSE file.
+Please, refer to this file for further details.

@@ -1,0 +1,102 @@
+#
+# Accelerometers
+#
+ifeq ($(SOMC_CFG_SENSORS_ACCEL_BMA150_INPUT),yes)
+DASH_SENSORS += bma150_input.c
+DASH_SENSORS_CFLAGS += -DACC_BMA150_INPUT
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_ACCEL_BMA250_INPUT),yes)
+DASH_SENSORS += bma250_input.c
+DASH_SENSORS_CFLAGS += -DACC_BMA250_INPUT
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_ACCEL_BMA250NA_INPUT),yes)
+DASH_SENSORS += bma250na_input.c
+DASH_SENSORS += wrappers/bma250na_input_accelerometer.c
+DASH_SENSORS_CFLAGS += -DACC_BMA250_INPUT
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_COMPASS_LSM303DLH),yes)
+DASH_SENSORS_CFLAGS += -DST_LSM303DLH
+DASH_ST_LSM303DLHX_ENABLE = yes
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_COMPASS_LSM303DLHC),yes)
+DASH_SENSORS_CFLAGS += -DST_LSM303DLHC
+DASH_ST_LSM303DLHX_ENABLE = yes
+endif
+
+ifeq ($(DASH_ST_LSM303DLHX_ENABLE),yes)
+DASH_SENSORS += sensor_xyz.c
+DASH_SENSORS += lsm303dlhx_acc.c
+DASH_SENSORS += wrappers/lsm303dlhx_accelerometer.c
+endif
+
+#
+# Compasses
+#
+
+#
+# Light sensors
+#
+
+#
+# Proximity sensors
+#
+ifeq ($(SOMC_CFG_SENSORS_PROXIMITY_APDS9700),yes)
+DASH_SENSORS += apds970x.c
+PROXIMITY_SENSOR_NAME = "APDS9700 Proximity"
+DASH_SENSORS_CFLAGS += -DPROXIMITY_SENSOR_NAME=\"$(PROXIMITY_SENSOR_NAME)\"
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_PROXIMITY_APDS9702),yes)
+DASH_SENSORS += apds970x.c
+PROXIMITY_SENSOR_NAME = "APDS9702 Proximity"
+DASH_SENSORS_CFLAGS += -DPROXIMITY_SENSOR_NAME=\"$(PROXIMITY_SENSOR_NAME)\"
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_PROXIMITY_SHARP_GP2),yes)
+DASH_SENSORS += sharp_gp2.c
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_PROXIMITY_NOA3402),yes)
+DASH_SENSORS += noa3402.c
+DASH_SENSORS_CFLAGS += -DPROXIMITY_PATH=\"$(SOMC_CFG_SENSORS_PROXIMITY_NOA3402_PATH)\"
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_PROXIMITY_TLS2772),yes)
+DASH_SENSORS += tsl2772.c
+endif
+
+#
+# Pressure sensors
+#
+ifeq ($(SOMC_CFG_SENSORS_PRESSURE_BMP180),yes)
+DASH_SENSORS += bmp180_input.c
+endif
+
+ifeq ($(SOMC_CFG_SENSORS_PRESSURE_LPS331AP),yes)
+DASH_SENSORS += lps331ap_input.c
+endif
+
+#
+# Gyro sensors
+#
+
+ifeq ($(SOMC_CFG_SENSORS_GYRO_L3G4200D),yes)
+ifneq ($(DASH_ST_LSM303DLHX_ENABLE),yes)
+DASH_SENSORS += sensor_xyz.c
+endif
+DASH_SENSORS += l3g4200d_gyro.c
+DASH_SENSORS += wrappers/l3g4200d_gyroscope.c
+DASH_SENSORS_CFLAGS += -DGYRO_L3G4200D_INPUT
+endif
+
+#
+# Wrapper sensors
+#
+
+#
+# LinearAcceleration, RotationVector, Gravity
+#

@@ -1,0 +1,8 @@
+# Test
+bma150_axis_x=0,0,1
+bma150_axis_y = 0, 1, 0
+bma150_axis_z = 1,   0 , 0
+
+akm8973_name = Hej
+akm8973_version = 1
+

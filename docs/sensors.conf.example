@@ -1,0 +1,12 @@
+#
+# This is an example of a sensor configuration file for DASH.
+# It sets up the axis of a bma250 accelerometer as mounted on
+# the PCB.
+#
+bma250input_axis_x = 0
+bma250input_axis_y = 1
+bma250input_axis_z = 2
+
+bma250input_neg_x = 0
+bma250input_neg_y = 0
+bma250input_neg_z = 0
