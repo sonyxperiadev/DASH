@@ -12,8 +12,8 @@ Table of contents
 3 ............ License
 
 
-1 Motivation
-------------
+1 Description
+-------------
 
 This sensor HAL implementation makes it possible to use one generic piece
 of code to satisfy multiple product requirements. By adding the possibility
@@ -150,5 +150,5 @@ put in the libs directory.
 3 License
 ---------
 
-The license for all code in this project is specified in the LICENSE file.
+The license for all code in this project is specified in the NOTICE file.
 Please, refer to this file for further details.
