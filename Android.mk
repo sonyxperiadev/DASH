@@ -1,5 +1,3 @@
-ifeq ($(SOMC_CFG_DASH_INCLUDED),yes)
-
 LOCAL_PATH := $(call my-dir)
 
 # HAL module implemenation, not prelinked and stored in
@@ -44,4 +42,3 @@ include $(BUILD_SHARED_LIBRARY)
 
 include $(call first-makefiles-under, $(LOCAL_PATH)/libs)
 
-endif
