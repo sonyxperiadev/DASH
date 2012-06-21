@@ -53,6 +53,13 @@ $(yes-var-compass-ak897xna)-files += ak897xna.c wrappers/ak897xna_sensors.c
 #
 # Light sensors
 #
+$(SOMC_CFG_SENSORS_SYSTEM_WIDE_ALS)-files += sys_als.c
+$(SOMC_CFG_SENSORS_SYSTEM_WIDE_ALS)-c-includes += $(DASH_ROOT)/libs/libals
+$(SOMC_CFG_SENSORS_SYSTEM_WIDE_ALS)-shared-libs += liblights-core
+$(SOMC_CFG_SENSORS_SYSTEM_WIDE_ALS)-var-set-light-range = yes
+
+$(yes-var-set-light-range)-cflags += \
+	-DLIGHT_RANGE=$(if $(SOMC_CFG_SENSORS_LIGHT_RANGE),$(SOMC_CFG_SENSORS_LIGHT_RANGE),900)
 
 #
 # Proximity sensors
