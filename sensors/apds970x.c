@@ -316,9 +316,6 @@ static void *apds9700_read(void *arg)
 
 			sensors_fifo_put(&data);
 
-			/* sleep for delay time */
-			sensors_nsleep(d->delay);
-
 			goto exit;
 
 		default:
