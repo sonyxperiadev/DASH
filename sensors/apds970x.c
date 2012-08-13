@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <fcntl.h>
 #include <linux/input.h>
 #include <errno.h>
@@ -83,14 +83,14 @@ static void apds9700_init_threshold_members(struct sensor_desc *d, int fd_input)
 
 	if (ioctl(fd_input, EVIOCGPHYS(sizeof(buf)), buf) < 0 ||
 	    snprintf(d->th_path, sizeof(d->th_path), "%s/threshold", buf) < 0) {
-		LOGE("%s: getting device physical path failed (%s)\n",
+		ALOGE("%s: getting device physical path failed (%s)\n",
 		     __func__, strerror(errno));
 		goto exit_with_defaults;
 	}
 
 	fd_th = open(d->th_path, O_RDONLY);
 	if (fd_th < 0) {
-		LOGE("%s: opening %s for read failed (%s)\n",
+		ALOGE("%s: opening %s for read failed (%s)\n",
 		     __func__, d->th_path, strerror(errno));
 		goto exit_with_defaults;
 	}
@@ -124,16 +124,16 @@ static void apds9700_init_burst_members(struct sensor_desc *d, int fd_input)
 	if (ioctl(fd_input, EVIOCGPHYS(sizeof(buf)), buf) < 0 ||
 	    snprintf(d->burst_path, sizeof(d->burst_path),
 		"%s/nburst", buf) < 0) {
-		LOGE("%s: getting device physical path failed (%s)\n",
+		ALOGE("%s: getting device physical path failed (%s)\n",
 		     __func__, strerror(errno));
 		goto exit_with_defaults;
 	}
 
 	fd_burst = open(d->burst_path, O_RDONLY);
 	if (fd_burst < 0) {
-		LOGE("%s: opening %s for read failed (%s)\n",
+		ALOGE("%s: opening %s for read failed (%s)\n",
 		     __func__, d->burst_path, strerror(errno));
-		LOGE("burst path error read error\n");
+		ALOGE("burst path error read error\n");
 		goto exit_with_defaults;
 	}
 
@@ -159,7 +159,7 @@ static void apds9700_init_burst_members(struct sensor_desc *d, int fd_input)
 	return;
 
 exit_with_defaults:
-	LOGE("Default burst path error\n");
+	ALOGE("Default burst path error\n");
 	d->burst_path[0] = 0;
 	d->burst_not_det = BURST_DEFAULT;
 	d->burst_det = BURST_DEFAULT - 1;
@@ -174,7 +174,7 @@ static void apds9700_change_threshold(struct sensor_desc *d)
 
 	fd_th = open(d->th_path, O_WRONLY);
 	if (fd_th < 0) {
-		LOGE("%s: opening %s for write failed (%s)\n",
+		ALOGE("%s: opening %s for write failed (%s)\n",
 		     __func__, d->th_path, strerror(errno));
 	} else {
 		int th_new = (d->distance == 0.0) ? d->th_det : d->th_not_det;
@@ -197,7 +197,7 @@ static void apds9700_change_burst(struct sensor_desc *d)
 
 	fd_burst = open(d->burst_path, O_WRONLY);
 	if (fd_burst < 0) {
-		LOGE("%s: opening %s for write failed (%s)\n",
+		ALOGE("%s: opening %s for write failed (%s)\n",
 		     __func__, d->burst_path, strerror(errno));
 	} else {
 		int burst_new = (d->distance == 0.0)
@@ -222,7 +222,7 @@ static int apds9700_init(struct sensor_api_t *s)
 	/* check for availablity */
 	fd = open_input_dev_by_name(PROXIMITY_DEV_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
-		LOGE("%s: unable to find %s input device!\n", __func__,
+		ALOGE("%s: unable to find %s input device!\n", __func__,
 			PROXIMITY_DEV_NAME);
 		return fd;
 	}
@@ -243,7 +243,7 @@ static int apds9700_activate(struct sensor_api_t *s, int enable)
 		fd = open_input_dev_by_name(PROXIMITY_DEV_NAME,
 			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
-			LOGE("%s: failed to open input dev %s\n", __func__,
+			ALOGE("%s: failed to open input dev %s\n", __func__,
 				PROXIMITY_DEV_NAME);
 			return fd;
 		}

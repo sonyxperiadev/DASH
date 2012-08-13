@@ -17,7 +17,7 @@
 #define LOG_TAG "DASH - lps331ap_input"
 
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/input.h>
@@ -77,7 +77,7 @@ static int lps331ap_input_init(struct sensor_api_t *s)
 	fd = open_input_dev_by_name_store_nr(LPS331AP_PRS_DEV_NAME,
 		O_RDONLY | O_NONBLOCK, lps331ap_pressure_input.nr, NR_MAX_SIZE);
 	if (fd < 0) {
-		LOGE("%s: failed to open input dev %s, error: %s\n",
+		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, LPS331AP_PRS_DEV_NAME, strerror(errno));
 		return -1;
 	}
@@ -97,7 +97,7 @@ static int lps331ap_input_activate(struct sensor_api_t *s, int enable)
 			O_RDONLY | O_NONBLOCK, lps331ap_pressure_input.nr,
 			NR_MAX_SIZE);
 		if (fd < 0) {
-			LOGE("%s: failed to open input dev %s, error: %s\n",
+			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, LPS331AP_PRS_DEV_NAME,
 				strerror(errno));
 			return -1;
@@ -131,14 +131,14 @@ static int lps331ap_input_set_delay(struct sensor_api_t *s, int64_t ns)
 			"%s%s/device/poll_period_ms",
 			path, lps331ap_pressure_input.nr);
 	if ((count < 0) || (count >= (int)sizeof(sysfs_path))) {
-		LOGE("%s: snprintf failed, invalid count %d\n",
+		ALOGE("%s: snprintf failed, invalid count %d\n",
 			__func__, count);
 		return -1;
 	}
 
 	sysfs_fd = open(sysfs_path, O_RDWR);
 	if (sysfs_fd < 0) {
-		LOGE("%s: open %s failed, error: %s\n", __func__,
+		ALOGE("%s: open %s failed, error: %s\n", __func__,
 			sysfs_path, strerror(errno));
 		return sysfs_fd;
 	}
@@ -146,7 +146,7 @@ static int lps331ap_input_set_delay(struct sensor_api_t *s, int64_t ns)
 	count = snprintf(buf, sizeof(buf), "%d\n", ms);
 	if ((count < 0) || (count >= (int)sizeof(buf))) {
 		close(sysfs_fd);
-		LOGE("%s: snprintf failed, invalid count %d\n",
+		ALOGE("%s: snprintf failed, invalid count %d\n",
 			__func__, count);
 		return -1;
 	}
@@ -154,7 +154,7 @@ static int lps331ap_input_set_delay(struct sensor_api_t *s, int64_t ns)
 	len = write(sysfs_fd, buf, count + 1);
 	close(sysfs_fd);
 	if (len < 0) {
-		LOGE("%s: write %s failed, error: %d\n", __func__,
+		ALOGE("%s: write %s failed, error: %d\n", __func__,
 			sysfs_path, len);
 		return len;
 	}
@@ -182,7 +182,7 @@ static void *lps331ap_input_read(void *arg)
 	bytes = read(fd, event, sizeof(event));
 
 	if (bytes < 0) {
-		LOGE("%s: read failed, error: %d\n", __func__, bytes);
+		ALOGE("%s: read failed, error: %d\n", __func__, bytes);
 		return NULL;
 	}
 
@@ -211,7 +211,7 @@ static void *lps331ap_input_read(void *arg)
 			/* report pressure */
 			pressure = d->current_data[0] / d->num_samples;
 			data.pressure = pressure / ROW_TO_MBAR_SCALE;
-			LOGD_IF(DEBUG_VERBOSE, "lps331ap: %f", data.pressure);
+			ALOGD_IF(DEBUG_VERBOSE, "lps331ap: %f", data.pressure);
 			data.version = lps331ap_pressure_input.sensor.version;
 			data.sensor = lps331ap_pressure_input.sensor.handle;
 			data.type = lps331ap_pressure_input.sensor.type;
@@ -220,7 +220,7 @@ static void *lps331ap_input_read(void *arg)
 			break;
 
 		default:
-			LOGE("%s: unknown event type 0x%X\n",
+			ALOGE("%s: unknown event type 0x%X\n",
 				__func__, event[i].type);
 			break;
 		}

@@ -17,7 +17,7 @@
 #define LOG_TAG "DASH - bma250_input_acc - wrapper"
 
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/input.h>

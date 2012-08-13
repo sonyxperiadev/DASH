@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include "sensors_list.h"
 #include "sensors_fifo.h"
 #include "sensors_id.h"

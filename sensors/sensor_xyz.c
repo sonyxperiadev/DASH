@@ -44,12 +44,12 @@ static int config_read_axis(char *prefix, char *key, struct config_record *cr)
 			memcpy(cr->store, tmp, sizeof(tmp));
 			rc = 0;
 		} else {
-			LOGE("%s: bad config (%s_%s) [%2d %2d %2d]", __func__,
+			ALOGE("%s: bad config (%s_%s) [%2d %2d %2d]", __func__,
 					prefix, key, tmp[AXIS_X], tmp[AXIS_Y],
 					tmp[AXIS_Z]);
 		}
 	} else {
-		LOGE("%s: failed to read %s_%s", __func__, prefix, key);
+		ALOGE("%s: failed to read %s_%s", __func__, prefix, key);
 	}
 
 	return rc;
@@ -60,7 +60,7 @@ static void config_read_sensor_map(struct sensor_desc *d)
 	struct config_record rec;
 
 	if (!sensors_have_config_file()) {
-		LOGV("%s: No config file found. Using default config.",
+		ALOGV("%s: No config file found. Using default config.",
 		     __func__);
 		return;
 	}
@@ -90,21 +90,21 @@ static int store_str_attr(struct sensor_desc *d, const char *attr,
 
 	rc = snprintf(d->phys_path + l, sizeof(d->phys_path) - l, "%s", attr);
 	if (((unsigned)rc >= sizeof(d->phys_path) - l) || rc < 0) {
-		LOGE("%s: Attr path truncated to '%s'\n", __func__,
+		ALOGE("%s: Attr path truncated to '%s'\n", __func__,
 				d->phys_path);
 		rc = -1;
 		goto exit;
 	}
 	fd = open(d->phys_path, O_WRONLY);
 	if (fd < 0) {
-		LOGE("%s: unable to open %s, err %d\n", __func__,
+		ALOGE("%s: unable to open %s, err %d\n", __func__,
 			d->phys_path, errno);
 		rc = -1;
 		goto exit;
 	}
 	rc = write(fd, val, strlen(val));
 	if (rc < 0)
-		LOGE("%s: unable to write %s (fd %d), err %d\n", __func__,
+		ALOGE("%s: unable to write %s (fd %d), err %d\n", __func__,
 			d->phys_path, fd, errno);
 	close(fd);
 
@@ -139,7 +139,7 @@ static int open_input_device(struct sensor_desc *d)
 		goto open_device;
 
 	if (d->find_input(d)) {
-		LOGE("%s: No input device for '%s'", __func__, d->sensor.name);
+		ALOGE("%s: No input device for '%s'", __func__, d->sensor.name);
 		/*
 		* Not created yet? Try to find it next time.
 		*/
@@ -149,7 +149,7 @@ static int open_input_device(struct sensor_desc *d)
 open_device:
 	rc = open(d->dev_path, O_RDONLY | O_NONBLOCK);
 	if (rc < 0)
-		LOGE("%s: Failed to open '%s' but got access R_OK",
+		ALOGE("%s: Failed to open '%s' but got access R_OK",
 					__func__, d->dev_path);
 	return rc;
 }
@@ -162,7 +162,7 @@ int sensor_xyz_init(struct sensor_api_t *s_api)
 	rc = dev_phys_path_by_attr("name", d->dev_name, PHYS_PATH_BASE,
 		d->phys_path, sizeof(d->phys_path));
 	if (rc) {
-		LOGE("%s: no phys dev path for dev name '%s'", __func__,
+		ALOGE("%s: no phys dev path for dev name '%s'", __func__,
 			d->dev_name);
 		*d->phys_path = 0;
 	}
@@ -173,7 +173,7 @@ int sensor_xyz_init(struct sensor_api_t *s_api)
 					d->dev_modes[MODE_NORMAL]);
 
 		if (rc) {
-			LOGE("%s: failed to set init mode for dev name '%s'",
+			ALOGE("%s: failed to set init mode for dev name '%s'",
 				__func__, d->dev_name);
 		}
 	}
@@ -241,7 +241,7 @@ int sensor_xyz_activate(struct sensor_api_t *s, int enable)
 	if (enable && fd < 0) {
 		fd = open_input_device(d);
 		if (fd < 0) {
-			LOGE("%s: Failed to enable '%s'",
+			ALOGE("%s: Failed to enable '%s'",
 				__func__, d->sensor.name);
 			return fd;
 		}
@@ -269,12 +269,12 @@ void *sensor_xyz_read(void *arg)
 
 	n = read(fd, events, sizeof(events));
 	if (n < 0) {
-		LOGE("%s: read error '%s' from fd %d sensor '%s' built %s @ %s",
+		ALOGE("%s: read error '%s' from fd %d sensor '%s' built %s @ %s",
 			__func__, strerror(errno), fd, p->sensor.name,
 			__DATE__, __TIME__);
 		return NULL;
 	} else if (n == 0) {
-		LOGE("%s: read error end of file from fd %d, sensor '%s'",
+		ALOGE("%s: read error end of file from fd %d, sensor '%s'",
 			__func__, fd, p->sensor.name);
 		return NULL;
 	}

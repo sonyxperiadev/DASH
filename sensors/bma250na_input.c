@@ -17,7 +17,7 @@
 #define LOG_TAG "DASH - bma250_input"
 
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/input.h>
@@ -110,7 +110,7 @@ static void bma250_input_read_config(struct sensor_desc *d)
 	unsigned int i;
 
 	if (!sensors_have_config_file()) {
-		LOGI("%s: No config file found: using default config.",
+		ALOGI("%s: No config file found: using default config.",
 		     __func__);
 		return;
 	}
@@ -121,12 +121,12 @@ static void bma250_input_read_config(struct sensor_desc *d)
 					   TYPE_INT,
 					   (void*)&value,
 					   sizeof(value)) < 0) {
-			LOGE("%s: failed to read %s", __func__, conf_values[i].key);
+			ALOGE("%s: failed to read %s", __func__, conf_values[i].key);
 			return;
 		}
 
 		if ((value < conf_values[i].min) || (value > conf_values[i].max)) {
-			LOGE("%s: %s value out of bounds: %d\n", __func__,
+			ALOGE("%s: %s value out of bounds: %d\n", __func__,
 			     conf_values[i].key, value);
 			return;
 		}
@@ -152,7 +152,7 @@ static int bma250_input_init(struct sensor_api_t *s)
 	fd = open_input_dev_by_name_store_nr(BMA250_INPUT_NAME,
 			O_RDONLY | O_NONBLOCK, bma250_input.nr, NR_MAX_SIZE);
 	if (fd < 0) {
-		LOGE("%s: failed to open input dev %s, error: %s\n",
+		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, BMA250_INPUT_NAME, strerror(errno));
 		return -1;
 	}
@@ -171,7 +171,7 @@ static int bma250_input_activate(struct sensor_api_t *s, int enable)
 		fd = open_input_dev_by_name_store_nr(BMA250_INPUT_NAME,
 			O_RDONLY | O_NONBLOCK, bma250_input.nr, NR_MAX_SIZE);
 		if (fd < 0) {
-			LOGE("%s: failed to open input dev %s, error: %s\n",
+			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, BMA250_INPUT_NAME, strerror(errno));
 			return -1;
 		}
@@ -224,16 +224,16 @@ static int bma250_input_set_delay(struct sensor_api_t *s, int64_t ns)
 	return 0;
 
 snprintf_error:
-	LOGE("%s: snprintf failed, invalid count %d\n", __func__, count);
+	ALOGE("%s: snprintf failed, invalid count %d\n", __func__, count);
 	return -1;
 
 open_error:
-	LOGE("%s: open %s failed, error: %s\n", __func__, sysfs_path,
+	ALOGE("%s: open %s failed, error: %s\n", __func__, sysfs_path,
 		strerror(errno));
 	return sysfs_fd;
 
 write_error:
-	LOGE("%s: write %s failed, error: %d\n", __func__, sysfs_path, len);
+	ALOGE("%s: write %s failed, error: %d\n", __func__, sysfs_path, len);
 	return len;
 }
 
@@ -260,7 +260,7 @@ static void *bma250_input_read(void *arg)
 
 	n = read(fd, events, sizeof(events)) / sizeof(events[0]);
 	if (n < 0) {
-		LOGE("%s: read error from fd %d, errno %d", __func__, fd, errno);
+		ALOGE("%s: read error from fd %d, errno %d", __func__, fd, errno);
 		goto exit;
 	}
 
@@ -286,7 +286,7 @@ static void *bma250_input_read(void *arg)
 				break;
 
 			default:
-				LOGE("%s: unknown event code 0x%X\n",
+				ALOGE("%s: unknown event code 0x%X\n",
 					__func__, e->code);
 				break;
 			}
@@ -304,7 +304,7 @@ static void *bma250_input_read(void *arg)
 			break;
 
 		default:
-			LOGE("%s: unknown event type 0x%X\n",
+			ALOGE("%s: unknown event type 0x%X\n",
 				__func__, e->type);
 			break;
 		}

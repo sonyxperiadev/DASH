@@ -15,7 +15,7 @@
  */
 #define LOG_TAG "DASH - fifo"
 
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <pthread.h>
 #include "sensors_fifo.h"
 

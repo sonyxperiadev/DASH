@@ -16,7 +16,7 @@
 
 #define LOG_TAG "DASH - worker"
 
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <time.h>
 #include <string.h>
 #include <errno.h>

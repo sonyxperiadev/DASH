@@ -17,7 +17,7 @@
 #define LOG_TAG "DASH - module"
 
 #include <stdio.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include "sensors_list.h"
@@ -31,7 +31,7 @@ static int sensors_module_set_delay(struct sensors_poll_device_t *dev,
 	struct sensor_api_t* api = sensors_list_get_api_from_handle(handle);
 
 	if (!api) {
-		LOGE("%s: unable to find handle!", __func__);
+		ALOGE("%s: unable to find handle!", __func__);
                 return -1;
         }
 
@@ -46,7 +46,7 @@ static int sensors_module_activate(struct sensors_poll_device_t *dev,
 	struct sensor_api_t* api = sensors_list_get_api_from_handle(handle);
 
 	if (!api) {
-		LOGE("%s: unable to find handle!", __func__);
+		ALOGE("%s: unable to find handle!", __func__);
                 return -1;
         }
 

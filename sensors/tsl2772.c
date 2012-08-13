@@ -20,7 +20,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <linux/input.h>
 #include "sensors_list.h"
 #include "sensors_fifo.h"
@@ -69,7 +69,7 @@ static int tsl2772_init(struct sensor_api_t *s)
 
 	fd = open_input_dev_by_name(d->name, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
-		LOGE("%s: failed to open input dev %s, error: %s\n",
+		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, d->name, strerror(errno));
 		return -1;
 	}
@@ -87,7 +87,7 @@ static int tsl2772_activate(struct sensor_api_t *s, int enable)
 	if (enable && (fd < 0)) {
 		fd = open_input_dev_by_name(d->name, O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
-			LOGE("%s: failed to open input dev %s, error: %s\n",
+			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, d->name, strerror(errno));
 			return -1;
 		}
@@ -125,7 +125,7 @@ static void *tsl2772_read(void *arg)
 
 	bytes = read(fd, event, sizeof(event));
 	if (bytes < 0) {
-		LOGE("%s: read failed, error: %d\n", __func__, bytes);
+		ALOGE("%s: read failed, error: %d\n", __func__, bytes);
 		return NULL;
 	}
 

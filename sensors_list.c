@@ -16,7 +16,7 @@
 
 #define LOG_TAG "DASH - list"
 
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <string.h>
 #include "sensors_list.h"
 

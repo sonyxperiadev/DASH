@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <fcntl.h>
 #include <linux/input.h>
 #include <errno.h>
@@ -83,14 +83,14 @@ static int noa3402_get_current_distance(float *current_distance)
 
 	fd = open(PROXIMITY_PATH, O_RDONLY);
 	if (fd < 0) {
-		LOGE("%s: Failed to open %s\n", __func__, PROXIMITY_PATH);
+		ALOGE("%s: Failed to open %s\n", __func__, PROXIMITY_PATH);
 		ret = -ENODEV;
 		goto exit;
 	}
 	if (read(fd, &result, sizeof(result)) == sizeof(result)) {
 		*current_distance = strncmp(&result, "0", 1) ? 1.0 : 0.0;
 	} else {
-		LOGE("%s: Failed to read initial proximity state\n", __func__);
+		ALOGE("%s: Failed to read initial proximity state\n", __func__);
 		ret = -ENODEV;
 	}
 	close(fd);
@@ -106,7 +106,7 @@ static int noa3402_init(struct sensor_api_t *s)
 	/* check for availablity */
 	fd = open_input_dev_by_name(NOA3402_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
-		LOGE("%s: unable to find %s input device!\n", __func__,
+		ALOGE("%s: unable to find %s input device!\n", __func__,
 			NOA3402_NAME);
 		return fd;
 	}
@@ -126,7 +126,7 @@ static int noa3402_activate(struct sensor_api_t *s, int enable)
 		fd = open_input_dev_by_name(NOA3402_NAME,
 			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
-			LOGE("%s: failed to open input dev %s\n", __func__,
+			ALOGE("%s: failed to open input dev %s\n", __func__,
 				NOA3402_NAME);
 			return fd;
 		}
@@ -165,7 +165,7 @@ static void *noa3402_read(void *arg)
 
 	bytes = read(fd, event, sizeof(event));
 	if (bytes < 0) {
-		LOGE("%s: read failed, error: %d\n", __func__, bytes);
+		ALOGE("%s: read failed, error: %d\n", __func__, bytes);
 		return NULL;
 	}
 
@@ -175,14 +175,14 @@ static void *noa3402_read(void *arg)
 			if (event[i].code == ABS_DISTANCE)
 				d->distance = event[i].value ? 1.0 : 0.0;
 			else
-				LOGE("%s: unknown event code 0x%X\n",
+				ALOGE("%s: unknown event code 0x%X\n",
 						__func__, event[i].code);
 			break;
 		case EV_SYN:
 			noa3402_report_distance(d->distance);
 			break;
 		default:
-			LOGE("%s: unknown event type 0x%X\n",
+			ALOGE("%s: unknown event type 0x%X\n",
 						__func__, event[i].type);
 			break;
 		}

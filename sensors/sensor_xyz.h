@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <linux/input.h>
 #include <sys/types.h>
 #include <sys/stat.h>

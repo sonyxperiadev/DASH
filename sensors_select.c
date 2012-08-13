@@ -18,7 +18,7 @@
 
 #include <unistd.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -30,12 +30,12 @@
 extern pthread_mutex_t wrapper_mutex;
 
 #define LOCK(p) do { \
-	LOGD("%s(%d): %s: lock\n", __FILE__, __LINE__, __func__); \
+	ALOGD("%s(%d): %s: lock\n", __FILE__, __LINE__, __func__); \
 	pthread_mutex_lock(p); \
 } while (0)
 
 #define UNLOCK(p) do { \
-	LOGD("%s(%d): %s: unlock\n", __FILE__, __LINE__, __func__); \
+	ALOGD("%s(%d): %s: unlock\n", __FILE__, __LINE__, __func__); \
 	pthread_mutex_unlock(p); \
 } while (0)
 
@@ -55,7 +55,7 @@ static void *sensors_select_callback(void *arg)
 	ret = select(maxfd + 1, &readfds, NULL, NULL, NULL);
 
 	if (ret < 0) {
-		LOGE("%s: select failed!\n", __func__);
+		ALOGE("%s: select failed!\n", __func__);
 	} else if (ret) {
 		if (FD_ISSET(s->ctl_fds[0], &readfds)) {
 			read(s->ctl_fds[0], &ret, sizeof(ret));
@@ -75,7 +75,7 @@ static void scheduler_select_notify(struct sensors_select_t* s)
 {
 	int rc = write(s->ctl_fds[1], &rc, sizeof (rc));
 	if (rc < 0)
-		LOGE("%s: write failed: %s", __func__, strerror(errno));
+		ALOGE("%s: write failed: %s", __func__, strerror(errno));
 }
 
 static void sensors_select_set_delay(struct sensors_select_t* s, int64_t ns)
@@ -140,7 +140,7 @@ void sensors_select_init(struct sensors_select_t* s,
 	s->delay = 0;
 
         if (pipe(s->ctl_fds) < 0)
-		LOGE("%s: pipe failed: %s", __func__, strerror(errno));
+		ALOGE("%s: pipe failed: %s", __func__, strerror(errno));
 
 	sensors_worker_init(&s->worker, sensors_select_callback, s);
 	s->worker.set_delay(&s->worker, 0);

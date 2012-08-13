@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <linux/input.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -126,12 +126,12 @@ static int config_read_axis(char *prefix, char *key, struct config_record *cr)
 			memcpy(cr->store, tmp, sizeof(tmp));
 			rc = 0;
 		} else {
-			LOGE("%s: bad config (%s_%s) [%2d %2d %2d]", __func__,
+			ALOGE("%s: bad config (%s_%s) [%2d %2d %2d]", __func__,
 					prefix, key, tmp[AXIS_X], tmp[AXIS_Y],
 					tmp[AXIS_Z]);
 		}
 	} else {
-		LOGE("%s: failed to read %s_%s", __func__, prefix, key);
+		ALOGE("%s: failed to read %s_%s", __func__, prefix, key);
 	}
 
 	return rc;
@@ -142,7 +142,7 @@ static void config_read_sensor_map(struct sensor_desc *d)
 	struct config_record rec;
 
 	if (!sensors_have_config_file()) {
-		LOGI("%s: No config file found. Using default config.",
+		ALOGI("%s: No config file found. Using default config.",
 		     __func__);
 		return;
 	}
@@ -158,9 +158,9 @@ static void config_read_sensor_map(struct sensor_desc *d)
 	rec.store = d->sign;
 	config_read_axis(d->map_prefix, "axis_sign", &rec);
 
-	LOGD("%s: %s: axis map [%2d %2d %2d]", __func__, d->sensor.name,
+	ALOGD("%s: %s: axis map [%2d %2d %2d]", __func__, d->sensor.name,
 	     d->map[AXIS_X], d->map[AXIS_Y], d->map[AXIS_Z]);
-	LOGD("%s: %s: axis sign [%2d %2d %2d]", __func__, d->sensor.name,
+	ALOGD("%s: %s: axis sign [%2d %2d %2d]", __func__, d->sensor.name,
 	     d->sign[AXIS_X], d->sign[AXIS_Y], d->sign[AXIS_Z]);
 }
 
@@ -176,22 +176,22 @@ static int store_str_attr(struct sensor_desc *d, const char *attr,
 
 	rc = snprintf(d->phys_path + l, sizeof(d->phys_path) - l, "%s", attr);
 	if ((unsigned)rc >= sizeof(d->phys_path) - l) {
-		LOGE("%s: Attr path truncated to '%s'\n", __func__,
+		ALOGE("%s: Attr path truncated to '%s'\n", __func__,
 				d->phys_path);
 		rc = -1;
 		goto exit;
 	}
 	fd = open(d->phys_path, O_WRONLY);
-	LOGD("%s: '%s' = %s", __func__, d->phys_path, val);
+	ALOGD("%s: '%s' = %s", __func__, d->phys_path, val);
 	if (fd < 0) {
-		LOGE("%s: unable to open %s, err %d\n", __func__,
+		ALOGE("%s: unable to open %s, err %d\n", __func__,
 				d->phys_path, errno);
 		rc = -1;
 		goto exit;
 	}
 	rc = write(fd, val, strlen(val));
 	if (rc < 0)
-		LOGE("%s: unable to write %s (fd %d), err %d\n", __func__,
+		ALOGE("%s: unable to write %s (fd %d), err %d\n", __func__,
 				d->phys_path, fd, errno);
 	close(fd);
 exit:
@@ -237,14 +237,14 @@ static int compass_run(sensors_event_t *s)
 				sensor_acc->data[1],
 				sensor_acc->data[2]);
 	if (rc) {
-		LOGE("%s: compass_API_SaveAcc, error %d\n", __func__, rc);
+		ALOGE("%s: compass_API_SaveAcc, error %d\n", __func__, rc);
 		goto exit;
 	}
 	rc = compass_API_SaveMag(sensor_mag->data[0],
 				sensor_mag->data[1],
 				sensor_mag->data[2]);
 	if (rc) {
-		LOGE("%s: compass_API_SaveMag, error %d\n", __func__, rc);
+		ALOGE("%s: compass_API_SaveMag, error %d\n", __func__, rc);
 		goto exit;
 	}
 	rc = compass_API_Run();
@@ -253,30 +253,30 @@ static int compass_run(sensors_event_t *s)
 		if (!rc)
 			accuracy = compass_API_GetCalibrationGodness();
 		else
-			LOGE("%s GetCalibrationGodness, error %d\n",
+			ALOGE("%s GetCalibrationGodness, error %d\n",
 				__func__, rc);
 	} else {
-		LOGE("%s: compass_API_Run, error %d\n", __func__, rc);
+		ALOGE("%s: compass_API_Run, error %d\n", __func__, rc);
 	}
 	rc = compass_API_GetNewFullScale();
 	if (rc) {
 		int range = to_lsm303dlh_mag_range(rc);
 
-		LOGD("%s: new range %d requested", __func__, rc);
+		ALOGD("%s: new range %d requested", __func__, rc);
 		if (sensor_mag->dev_attr_range_mg)
 			store_int_attr(sensor_mag,
 					sensor_mag->dev_attr_range_mg, range);
 		else
-			LOGI("%s: magnetic range not supported", __func__);
+			ALOGI("%s: magnetic range not supported", __func__);
 	}
 exit:
-	LOGD("%s: accuracy %d\n", __func__, accuracy);
+	ALOGD("%s: accuracy %d\n", __func__, accuracy);
 	return accuracy;
 }
 
 static void compass_formation(int value)
 {
-	LOGD("%s: formation %d", __func__, value);
+	ALOGD("%s: formation %d", __func__, value);
 	compass_API_ChangeFormFactor(!!value);
 }
 
@@ -297,12 +297,12 @@ static int open_input_device(struct sensor_desc *d)
 	int rc;
 
 	if (!*d->dev_path) {
-		LOGD("%s: No input device for %s", __func__, d->sensor.name);
+		ALOGD("%s: No input device for %s", __func__, d->sensor.name);
 		return -1;
 	}
 	rc = open(d->dev_path, O_RDONLY | O_NONBLOCK);
 	if (rc < 0) {
-		LOGE("%s: Failed to open '%s' but access (R_OK) got",
+		ALOGE("%s: Failed to open '%s' but access (R_OK) got",
 					__func__, d->dev_path);
 	}
 
@@ -317,7 +317,7 @@ static int sensor_init(struct sensor_api_t *s_api)
 	rc = dev_phys_path_by_attr("name", d->dev_name, PHYS_PATH_BASE,
 			d->phys_path, sizeof(d->phys_path));
 	if (rc) {
-		LOGE("%s: no phys dev path for dev name '%s'", __func__,
+		ALOGE("%s: no phys dev path for dev name '%s'", __func__,
 					d->dev_name);
 		*d->phys_path = 0;
 	}
@@ -348,7 +348,7 @@ static int compass_api_init(struct sensor_desc *d, int fd)
 
 	rc = compass_API_Init(LSM303DLH_H_8_1G, num_formations);
 	if (rc) {
-		LOGE("%s: Failed in API_Init, status %d", __func__, rc);
+		ALOGE("%s: Failed in API_Init, status %d", __func__, rc);
 		return rc;
 	}
 	f = set_current_formation(fd, 0);
@@ -525,7 +525,7 @@ static int activate_required_sensors(int enable)
 	return 0;
 
 err_exit:
-	LOGE("%s: failed on sensor '%s'\n", __func__, d->sensor.name);
+	ALOGE("%s: failed on sensor '%s'\n", __func__, d->sensor.name);
 	while(i > 0) {
 		d = required_sensors[--i];
 		sensor_activate_local(d, 0, USER_INTERNAL);
@@ -558,11 +558,11 @@ static int compass_sensor_activate(struct sensor_api_t *s, int enable)
 		}
 		if (fd >= 0)
 			close(fd);
-		LOGE("%s: '%s' can't be activated\n", __func__, d->sensor.name);
+		ALOGE("%s: '%s' can't be activated\n", __func__, d->sensor.name);
 	} else {
 		d->select_worker.suspend(&d->select_worker);
 		if (fd > 0) {
-			LOGD("%s: closing down fd %d\n", __func__, fd);
+			ALOGD("%s: closing down fd %d\n", __func__, fd);
 			d->select_worker.set_fd(&d->select_worker, -1);
 		}
 		activate_required_sensors(0);
@@ -591,7 +591,7 @@ static void *sensor_read(void *arg)
 
 	n = read(fd, events, sizeof(events)) / sizeof(events[0]);
 	if (n < 0) {
-		LOGE("%s: read error from fd %d, sensor '%s'", __func__,
+		ALOGE("%s: read error from fd %d, sensor '%s'", __func__,
 			fd, p->sensor.name);
 		return 0;
 	}
@@ -607,7 +607,7 @@ static void *sensor_read(void *arg)
 		if (e->type == EV_SYN &&
 				p->sensor.type != SENSOR_TYPE_ORIENTATION) {
 
-			LOGD_IF(DEBUG_VERBOSE, "%s(%s):%9lld %6d %6d %6d",
+			ALOGD_IF(DEBUG_VERBOSE, "%s(%s):%9lld %6d %6d %6d",
 					__func__,
 					p->sensor.name,
 					t,
@@ -641,7 +641,7 @@ static void *sensor_read(void *arg)
 				sdata.version = sensor_compass->sensor.version;
 				sdata.type = sensor_compass->sensor.type;
 				sensors_fifo_put(&sdata);
-				LOGD_IF(DEBUG_VERBOSE,
+				ALOGD_IF(DEBUG_VERBOSE,
 					"%s(%s):%9lld a=%3.0f, p=%4.1f, r=%4.1f, "
 					"status=%d (accuracy=%d)",
 					__func__,
@@ -809,31 +809,31 @@ void lsm303dlh_init_driver()
 		sensor_acc = &ls303dlh_acc;
 	if (sensor_acc) {
 		sensors_list_register(&sensor_acc->sensor, &sensor_acc->api);
-		LOGI("Accelerometer '%s' in use.", sensor_acc->sensor.name);
+		ALOGI("Accelerometer '%s' in use.", sensor_acc->sensor.name);
 	} else {
-		LOGE("No accelerometer found.");
+		ALOGE("No accelerometer found.");
 	}
 
 	if (!magnetometer.find_input(&magnetometer)) {
 		sensor_mag = &magnetometer;
 		sensors_list_register(&sensor_mag->sensor, &sensor_mag->api);
-		LOGI("Magnetometer '%s' in use.", sensor_mag->sensor.name);
+		ALOGI("Magnetometer '%s' in use.", sensor_mag->sensor.name);
 	} else {
-		LOGE("No magnetometer found.");
+		ALOGE("No magnetometer found.");
 	}
 
 	if (sensor_acc && sensor_mag) {
 		if (!compass.find_input(&compass)) {
-			LOGI("e-Compass: device with slider detected.");
+			ALOGI("e-Compass: device with slider detected.");
 			num_formations = 1;
 		} else {
-			LOGI("e-Compass: no slider found.");
+			ALOGI("e-Compass: no slider found.");
 			*compass.dev_path = 0;
 		}
 		sensors_list_register(&compass.sensor, &compass.api);
 		required_sensors[0] = sensor_acc;
 		required_sensors[1] = sensor_mag;
 		sensor_compass = &compass;
-		LOGI("e-Compass '%s' in use.", compass.sensor.name);
+		ALOGI("e-Compass '%s' in use.", compass.sensor.name);
 	}
 }

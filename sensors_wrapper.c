@@ -18,7 +18,7 @@
 
 #include <stddef.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <pthread.h>
 #include "sensor_util.h"
 #include "sensors_wrapper.h"
@@ -32,12 +32,12 @@
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 #define LOCK(p) do { \
-	LOGD("%s(%d): %s: lock\n", __FILE__, __LINE__, __func__); \
+	ALOGD("%s(%d): %s: lock\n", __FILE__, __LINE__, __func__); \
 	pthread_mutex_lock(p); \
 } while (0)
 
 #define UNLOCK(p) do { \
-	LOGD("%s(%d): %s: unlock\n", __FILE__, __LINE__, __func__); \
+	ALOGD("%s(%d): %s: unlock\n", __FILE__, __LINE__, __func__); \
 	pthread_mutex_unlock(p); \
 } while (0)
 
@@ -109,9 +109,9 @@ void sensors_wrapper_register(struct sensor_t *sensor,
 
 	if (sensor == NULL || api == NULL || entry == NULL) {
 		if (sensor == NULL)
-			LOGE("%s: Error sensor is NULL pointer", __func__);
+			ALOGE("%s: Error sensor is NULL pointer", __func__);
 		else
-			LOGE("%s: Error %s NULL pointer", __func__,
+			ALOGE("%s: Error %s NULL pointer", __func__,
 				sensor->name);
 		return;
 	}
@@ -143,7 +143,7 @@ void sensors_wrapper_data(struct sensor_data_t *sd)
 	while (sd->sensor != list[i].sensor) {
 		i++;
 		if (i >= idx) {
-			LOGE("%s: Error %s not found",
+			ALOGE("%s: Error %s not found",
 				__func__, sd->sensor->name);
 			return;
 		}
@@ -182,7 +182,7 @@ int sensors_wrapper_init(struct sensor_api_t *s)
 					rv = list[i].api->init(list[i].api);
 
 				if (rv < 0) {
-					LOGE("%s: Error %s init failed",
+					ALOGE("%s: Error %s init failed",
 					__func__, list[i].sensor->name);
 				} else {
 					list_set_status(

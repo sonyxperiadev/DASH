@@ -17,7 +17,7 @@
 #define LOG_TAG "DASH - bmp180_input"
 
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/input.h>
@@ -73,7 +73,7 @@ static int bmp180_input_init(struct sensor_api_t *s)
 	fd = open_input_dev_by_name_store_nr(BMP180_INPUT_NAME,
 		O_RDONLY | O_NONBLOCK, bmp180_pressure_input.nr, NR_MAX_SIZE);
 	if (fd < 0) {
-		LOGE("%s: failed to open input dev %s, error: %s\n",
+		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, BMP180_INPUT_NAME, strerror(errno));
 		return -1;
 	}
@@ -93,7 +93,7 @@ static int bmp180_input_activate(struct sensor_api_t *s, int enable)
 			O_RDONLY | O_NONBLOCK, bmp180_pressure_input.nr,
 			NR_MAX_SIZE);
 		if (fd < 0) {
-			LOGE("%s: failed to open input dev %s, error: %s\n",
+			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, BMP180_INPUT_NAME, strerror(errno));
 			return -1;
 		}
@@ -141,16 +141,16 @@ static int bmp180_input_set_delay(struct sensor_api_t *s, int64_t ns)
 	return 0;
 
 snprintf_error:
-	LOGE("%s: snprintf failed, invalid count %d\n", __func__, count);
+	ALOGE("%s: snprintf failed, invalid count %d\n", __func__, count);
 	return -1;
 
 open_error:
-	LOGE("%s: open %s failed, error: %s\n", __func__, sysfs_path,
+	ALOGE("%s: open %s failed, error: %s\n", __func__, sysfs_path,
 		strerror(errno));
 	return sysfs_fd;
 
 write_error:
-	LOGE("%s: write %s failed, error: %d\n", __func__, sysfs_path, len);
+	ALOGE("%s: write %s failed, error: %d\n", __func__, sysfs_path, len);
 	return len;
 }
 
@@ -173,7 +173,7 @@ static void *bmp180_input_read(void *arg)
 	bytes = read(fd, event, sizeof(event));
 
 	if (bytes < 0) {
-		LOGE("%s: read failed, error: %d\n", __func__, bytes);
+		ALOGE("%s: read failed, error: %d\n", __func__, bytes);
 		goto exit;
 	}
 
@@ -192,7 +192,7 @@ static void *bmp180_input_read(void *arg)
 				break;
 
 			default:
-				LOGE("%s: unknown event code 0x%X\n",
+				ALOGE("%s: unknown event code 0x%X\n",
 					__func__, event[i].code);
 				break;
 			}
@@ -209,7 +209,7 @@ static void *bmp180_input_read(void *arg)
 			break;
 
 		default:
-			LOGE("%s: unknown event type 0x%X\n",
+			ALOGE("%s: unknown event type 0x%X\n",
 				__func__, event[i].type);
 			break;
 		}

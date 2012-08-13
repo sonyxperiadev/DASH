@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include "sensors_list.h"
 #include "sensors_fifo.h"
 #include "sensors_id.h"
@@ -41,7 +41,7 @@ static int compass_init(struct sensor_api_t *s)
 
 	rc = compass_API_Init(LSM303DLH_H_8_1G, num_formations);
 	if (rc) {
-		LOGE("%s: Failed in API_Init, status %d", __func__, rc);
+		ALOGE("%s: Failed in API_Init, status %d", __func__, rc);
 		return rc;
 	}
 	compass_API_ChangeFormFactor(formation);
@@ -73,7 +73,7 @@ static void compass_data(struct sensor_api_t *s, struct sensor_data_t *sd)
 		rc = compass_API_SaveAcc(sd->data[AXIS_X], sd->data[AXIS_Y],
 						sd->data[AXIS_Z]);
 		if (rc) {
-			LOGE("%s: compass_API_SaveAcc, error %d\n",
+			ALOGE("%s: compass_API_SaveAcc, error %d\n",
 				__func__, rc);
 			return;
 		}
@@ -81,12 +81,12 @@ static void compass_data(struct sensor_api_t *s, struct sensor_data_t *sd)
 		rc = compass_API_SaveMag(sd->data[AXIS_X], sd->data[AXIS_Y],
 						sd->data[AXIS_Z]);
 		if (rc) {
-			LOGE("%s: compass_API_SaveMag, error %d\n",
+			ALOGE("%s: compass_API_SaveMag, error %d\n",
 				__func__, rc);
 			return;
 		}
 	} else {
-		LOGE("%s: unknown sensor %s\n", __func__, sd->sensor->name);
+		ALOGE("%s: unknown sensor %s\n", __func__, sd->sensor->name);
 		return;
 	}
 
@@ -99,10 +99,10 @@ static void compass_data(struct sensor_api_t *s, struct sensor_data_t *sd)
 			if (!rc)
 				accuracy = compass_API_GetCalibrationGodness();
 			else
-				LOGE("%s GetCalibrationGoodness, error %d\n",
+				ALOGE("%s GetCalibrationGoodness, error %d\n",
 					__func__, rc);
 		} else {
-			LOGE("%s: compass_API_Run, error %d\n", __func__, rc);
+			ALOGE("%s: compass_API_Run, error %d\n", __func__, rc);
 		}
 		if (accuracy < 0)
 			return;

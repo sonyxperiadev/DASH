@@ -28,7 +28,7 @@
 #include "sensor_util.h"
 #include <dirent.h>
 #include <ctype.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <pthread.h>
 #include "sensor_util_list.h"
 
@@ -98,7 +98,7 @@ int input_dev_path_by_name(char *name, char *path, int path_max)
 			}
 			temp = malloc(sizeof(*temp));
 			if (temp == NULL) {
-				LOGE("%s: malloc error!\n", __func__);
+				ALOGE("%s: malloc error!\n", __func__);
 				goto malloc_err;
 			}
 
@@ -224,7 +224,7 @@ int dev_phys_path_by_attr(const char *attr, const char *attr_val,
 
 	dir = opendir(base);
 	if (!dir) {
-		LOGE("Unable to open '%s'", base);
+		ALOGE("Unable to open '%s'", base);
 		return -1;
 	}
 
@@ -236,25 +236,25 @@ int dev_phys_path_by_attr(const char *attr, const char *attr_val,
 		rc = snprintf(path, path_max, "%s/%s/%s",
 				base, item->d_name, attr);
 		if (rc >= path_max) {
-			LOGD("Entry name truncated '%s'", path);
+			ALOGD("Entry name truncated '%s'", path);
 			continue;
 		}
 		fd = open(path, O_RDONLY);
 		if (fd < 0) {
-			LOGE("Unable to open '%s'", path);
+			ALOGE("Unable to open '%s'", path);
 			continue;
 		}
 		rc = read(fd, aval, sizeof(aval) - 1);
 		close(fd);
 		if (rc < 0) {
-			LOGE("Unable to read '%s'", path);
+			ALOGE("Unable to read '%s'", path);
 			continue;
 		}
 		aval[rc] = 0;
 		notfound = strncmp(aval, attr_val, len);
 		if (!notfound) {
 			path[strlen(path) - strlen(attr)] = 0;
-			LOGD("'%s' = '%s' found on  path '%s'",
+			ALOGD("'%s' = '%s' found on  path '%s'",
 					attr, attr_val, path);
 			break;
 		}

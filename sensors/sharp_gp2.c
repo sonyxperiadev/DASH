@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/input.h>
@@ -72,7 +72,7 @@ static int sharp_init(struct sensor_api_t *s)
 
 	fd = open_input_dev_by_name(PROXIMITY_DEV_NAME, O_RDONLY);
 	if (fd < 0) {
-		LOGE(LOG_TAG" %s: open device failed!", __func__);
+		ALOGE(LOG_TAG" %s: open device failed!", __func__);
 		return -1;
 	}
 	close(fd);
@@ -90,7 +90,7 @@ static int sharp_activate(struct sensor_api_t *s, int enable)
 		fd = open_input_dev_by_name(PROXIMITY_DEV_NAME,
 			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
-			LOGE("%s: failed to open input dev %s\n", __func__,
+			ALOGE("%s: failed to open input dev %s\n", __func__,
 				PROXIMITY_DEV_NAME);
 			return -1;
 		}

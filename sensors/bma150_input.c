@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <cutils/log.h>
+#include "sensors_log.h"
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -120,7 +120,7 @@ static void bma150_input_read_config(struct sensor_desc *d)
 	unsigned int i;
 
 	if (!sensors_have_config_file()) {
-		LOGI("%s: No config file found: using default config.",
+		ALOGI("%s: No config file found: using default config.",
 		     __func__);
 		return;
 	}
@@ -131,12 +131,12 @@ static void bma150_input_read_config(struct sensor_desc *d)
 					   TYPE_INT,
 					   (void*)&value,
 					   sizeof(value)) < 0) {
-			LOGE("%s: failed to read %s", __func__, conf_values[i].key);
+			ALOGE("%s: failed to read %s", __func__, conf_values[i].key);
 			return;
 		}
 
 		if ((value < conf_values[i].min) || (value > conf_values[i].max)) {
-			LOGE("%s: %s value out of bounds: %d\n", __func__,
+			ALOGE("%s: %s value out of bounds: %d\n", __func__,
 			     conf_values[i].key, value);
 			return;
 		}
@@ -168,7 +168,7 @@ static char *bma150_get_rate_path(int fd)
 		}
 	}
 	if (!ret)
-		LOGE("%s: failed to get rate path", __func__);
+		ALOGE("%s: failed to get rate path", __func__);
 
 	return ret;
 }
@@ -190,7 +190,7 @@ static void bma150_set_rate(const struct sensor_desc *d, int rate_msec)
 		close(rate_fd);
 	}
 	if (rc <= 0)
-		LOGE("%s: failed to set poll rate to %d ms", __func__, rate_msec);
+		ALOGE("%s: failed to set poll rate to %d ms", __func__, rate_msec);
 	return;
 }
 
@@ -203,7 +203,7 @@ static int bma150_input_init(struct sensor_api_t *s)
 	/* check for availablity */
 	fd = open_input_dev_by_name(BMA150_INPUT_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
-		LOGE("%s: unable to find %s input device!\n", __func__,
+		ALOGE("%s: unable to find %s input device!\n", __func__,
 			BMA150_INPUT_NAME);
 		return -1;
 	}
@@ -224,7 +224,7 @@ static int bma150_input_activate(struct sensor_api_t *s, int enable)
 		fd = open_input_dev_by_name(BMA150_INPUT_NAME,
 			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
-			LOGE("%s: failed to open input dev %s\n", __func__,
+			ALOGE("%s: failed to open input dev %s\n", __func__,
 				BMA150_INPUT_NAME);
 			return -1;
 		}
