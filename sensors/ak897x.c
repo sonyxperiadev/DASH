@@ -34,9 +34,9 @@
 #include "sensors_config.h"
 
 #if defined(AK8973)
-#include <linux/akm8973.h>
+#include "../include/akm8973.h"
 #elif defined(AK8975)
-#include <linux/i2c/akm8975.h>
+#include "../include/akm8975.h"
 #else
 #error No AKM chip is defined
 #endif
