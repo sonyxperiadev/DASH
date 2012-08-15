@@ -27,7 +27,7 @@ LOCAL_CFLAGS += -I$(LOCAL_PATH)/sensors
 #LOCAL_CFLAGS += -DDEBUG -UNDEBUG
 
 # Comment to enable debug
-LOCAL_CFLAGS += -DLOG_NDEBUG
+#LOCAL_CFLAGS += -DLOG_NDEBUG
 
 # Set 1 to enable verbose debug
 LOCAL_CFLAGS += -DDEBUG_VERBOSE=0
