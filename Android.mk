@@ -1,5 +1,3 @@
-ifeq ($(BUILD_SEMC_SENSORS),true)
-
 LOCAL_PATH := $(call my-dir)
 
 # HAL module implemenation, not prelinked and stored in
@@ -38,10 +36,9 @@ LOCAL_CFLAGS += $(DASH_SENSORS_CFLAGS)
 LOCAL_STATIC_LIBRARIES += $(DASH_SENSORS_STATIC_LIBS)
 LOCAL_SHARED_LIBRARIES += $(DASH_SENSORS_SHARED_LIBS)
 
-LOCAL_MODULE := sensors.semc
+LOCAL_MODULE := sensors.default
 LOCAL_MODULE_TAGS := optional
 include $(BUILD_SHARED_LIBRARY)
 
 include $(call first-makefiles-under, $(LOCAL_PATH)/libs)
 
-endif
