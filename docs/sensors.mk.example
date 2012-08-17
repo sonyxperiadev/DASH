@@ -2,6 +2,7 @@
 # This is an example of a DASH configuration makefile. It should preferably be
 # included from your device configuration make files.
 #
+SOMC_CFG_DASH_INCLUDED := yes
 SOMC_CFG_SENSORS_ACCEL_BMA250_INPUT := yes
 SOMC_CFG_SENSORS_COMPASS_LSM303DLH := yes
 SOMC_CFG_SENSORS_PROXIMITY_NOA3402 := yes
