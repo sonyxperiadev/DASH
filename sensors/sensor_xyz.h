@@ -24,7 +24,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <linux/input.h>
 #include <errno.h>
 #include "sensors_list.h"
 #include "sensors_fifo.h"
@@ -33,6 +32,7 @@
 #include "sensors_id.h"
 #include "sensors_config.h"
 #include "sensors_wrapper.h"
+#include "sensors_sysfs.h"
 #include "sensor_api.h"
 
 #define PHYS_PATH_BASE "/sys/bus/i2c/devices"
@@ -66,6 +66,7 @@ struct sensor_desc {
 	struct sensor_api_t api;
 	struct wrapper_entry entry;
 	struct sensors_select_t select_worker;
+	struct sensors_sysfs_t sysfs;
 	int data[NUM_AXIS];
 	char *map_prefix;
 	int map[NUM_AXIS];
