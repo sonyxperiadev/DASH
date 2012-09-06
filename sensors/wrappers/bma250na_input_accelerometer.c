@@ -43,7 +43,7 @@ static struct wrapper_desc bma250_input = {
 		maxRange: 156.96, /* max +/-16G */
 		resolution: 20,
 		power: 0.003,/* sleep 50ms */
-		minDelay: 10000
+		minDelay: 5000
 	},
 	.api = {
 		.init = sensors_wrapper_init,
