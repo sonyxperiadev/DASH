@@ -66,7 +66,7 @@ static struct sensor_desc apds970x = {
 		.type = SENSOR_TYPE_PROXIMITY,
 		.maxRange = 1.0,
 		.resolution = 1.0,
-		.power = 20
+		.power = 2
 	},
 	.api = {
 		.init = apds9700_init,
