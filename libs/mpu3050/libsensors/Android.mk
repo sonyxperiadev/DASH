@@ -1,35 +1,31 @@
 LOCAL_PATH := $(call my-dir)
 
-ifeq ($(SOMC_CFG_SENSORS_HAVE_LIBMPU3050), yes)
-# Add prebuilt libraries if available
-
-include $(CLEAR_VARS)
-LOCAL_MODULE_TAGS := optional
-LOCAL_PREBUILT_LIBS := libMPU3050.so
-include $(BUILD_MULTI_PREBUILT)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE_TAGS := optional
-LOCAL_PREBUILT_LIBS := libmpl.so
-include $(BUILD_MULTI_PREBUILT)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE_TAGS := optional
-LOCAL_PREBUILT_LIBS := libmllite.so
-include $(BUILD_MULTI_PREBUILT)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE_TAGS := optional
-LOCAL_PREBUILT_LIBS := libmlplatform.so
-include $(BUILD_MULTI_PREBUILT)
-else
-# Or else build the dummy lib
+ifneq ($(TARGET_SIMULATOR),true)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libMPU3050
 LOCAL_MODULE_TAGS := optional
-LOCAL_SRC_FILES := libMPU3050_dummy.c
-include $(BUILD_SHARED_LIBRARY)
-endif
 
+LOCAL_CFLAGS := -DLOG_TAG=\"Sensors\" -DCONFIG_MPU_SENSORS_MPU3050=1 -DDEBUG -UNDEBUG -DLOG_NDEBUG
+LOCAL_SRC_FILES := 			\
+			SensorBase.cpp	\
+			MPLSensor.cpp	\
+			MPLWrapper.cpp
+
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/mlsdk/platform/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/mlsdk/platform/linux
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/mlsdk/platform/include/linux
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/mlsdk/mllite
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/mlsdk/mldmp
+LOCAL_C_INCLUDES += $(DASH_ROOT)
+
+LOCAL_SHARED_LIBRARIES := liblog libcutils libutils libdl libmllite libmlplatform
+LOCAL_CPPFLAGS+=-DLINUX=1
+LOCAL_PRELINK_MODULE := false
+
+include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_MULTI_PREBUILT)
+endif # !TARGET_SIMULATOR
+
+include $(call all-subdir-makefiles)

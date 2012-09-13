@@ -1,4 +1,5 @@
 LOCAL_PATH := $(call my-dir)
+DASH_ROOT := $(LOCAL_PATH)
 
 # HAL module implemenation, not prelinked and stored in
 # hw/<SENSORS_HARDWARE_MODULE_ID>.<ro.product.board>.so
