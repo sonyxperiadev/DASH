@@ -27,8 +27,10 @@
 #include "sensors_select.h"
 #include "sensor_util.h"
 #include "sensors_id.h"
+#include "sensors_sysfs.h"
 
-#define PROXIMITY_DEV_NAME "gp2ap002a00f"
+#define PROXIMITY_DEV_NAME "proximity"
+#define NR_MAX_SIZE 4
 
 static int sharp_init(struct sensor_api_t *s);
 static int sharp_activate(struct sensor_api_t *s, int enable);
@@ -38,6 +40,7 @@ static void *sharp_read(void *arg);
 
 struct sensor_desc {
 	struct sensors_select_t select_worker;
+	struct sensors_sysfs_t sysfs;
 	struct sensor_t sensor;
 	struct sensor_api_t api;
 
@@ -47,7 +50,7 @@ struct sensor_desc {
 
 static struct sensor_desc sharp_gp2 = {
 	.sensor = {
-		name: "GP2 Proximity",
+		name: "DASH GP2 Proximity",
 		vendor: "Sharp",
 		version: sizeof(sensors_event_t),
 		handle: SENSOR_PROXIMITY_HANDLE,
@@ -76,6 +79,7 @@ static int sharp_init(struct sensor_api_t *s)
 	}
 	close(fd);
 
+	sensors_sysfs_init(&d->sysfs, PROXIMITY_DEV_NAME, SYSFS_TYPE_INPUT_DEV);
 	sensors_select_init(&d->select_worker, sharp_read, s, -1);
 	return 0;
 }
@@ -101,7 +105,7 @@ static int sharp_activate(struct sensor_api_t *s, int enable)
 	}
 
 
-	return 0;
+	return d->sysfs.write_int(&d->sysfs, "enable", enable);
 }
 
 static int sharp_set_delay(struct sensor_api_t *s, int64_t ns)
