@@ -29,7 +29,7 @@
 #include "sensors_id.h"
 #include "sensors_sysfs.h"
 
-#define BMP180_INPUT_NAME "bmp180"
+#define BMP180_INPUT_NAME "barometer"
 
 static int bmp180_input_init(struct sensor_api_t *s);
 static int bmp180_input_activate(struct sensor_api_t *s, int enable);
@@ -48,7 +48,7 @@ struct sensor_desc {
 
 static struct sensor_desc bmp180_pressure_input = {
 	.sensor = {
-		name: "BMP180 Pressure",
+		name: "DASH BMP180 Pressure",
 		vendor: "Bosch Sensortec GmbH",
 		version: sizeof(sensors_event_t),
 		handle: SENSOR_PRESSURE_HANDLE,
@@ -104,7 +104,7 @@ static int bmp180_input_activate(struct sensor_api_t *s, int enable)
 		d->select_worker.set_fd(&d->select_worker, -1);
 		d->select_worker.suspend(&d->select_worker);
 	}
-	return 0;
+	return d->sysfs.write_int(&d->sysfs, "enable", enable);
 }
 
 static int bmp180_input_set_delay(struct sensor_api_t *s, int64_t ns)
