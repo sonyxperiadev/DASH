@@ -283,6 +283,14 @@ static void apds9700_close(struct sensor_api_t *s)
 	d->select_worker.destroy(&d->select_worker);
 }
 
+static void apds9700_store_dist(struct sensor_desc *d, int value)
+{
+	d->distance = value ? 1.0 : 0.0;
+	if (d->burst_not_det != d->burst_det)
+		apds9700_change_burst(d);
+	apds9700_change_threshold(d);
+}
+
 static void *apds9700_read(void *arg)
 {
 	struct sensor_api_t *s = arg;
@@ -294,16 +302,14 @@ static void *apds9700_read(void *arg)
 
 	while ((ret = read(fd, &event, sizeof(event))) > 0) {
 		switch (event.type) {
+		case EV_MSC:
+			if (event.code == MSC_RAW)
+				apds9700_store_dist(d, event.value);
+			break;
 		case EV_ABS:
-			if (event.code == ABS_DISTANCE) {
-				d->distance = event.value ? 1.0 : 0.0;
-				if (d->burst_not_det != d->burst_det)
-					apds9700_change_burst(d);
-				apds9700_change_threshold(d);
-			}
-
-			goto exit;
-
+			if (event.code == ABS_DISTANCE)
+				apds9700_store_dist(d, event.value);
+			break;
 		case EV_SYN:
 			memset(&data, 0, sizeof(data));
 
@@ -315,11 +321,9 @@ static void *apds9700_read(void *arg)
 			data.timestamp = get_current_nano_time();
 
 			sensors_fifo_put(&data);
-
-			goto exit;
-
+			break;
 		default:
-			goto exit;
+			break;
 		}
 	}
 
