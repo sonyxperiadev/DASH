@@ -76,6 +76,9 @@ endif
 #
 # Light sensors
 #
+ifeq ($(SOMC_CFG_SENSORS_LIGHT_SHARP_GP2),yes)
+DASH_SENSORS += sharp_gp2_light.c
+endif
 
 #
 # Proximity sensors
