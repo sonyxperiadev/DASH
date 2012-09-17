@@ -41,7 +41,6 @@ struct sensor_desc {
 	struct sensor_t sensor;
 	struct sensor_api_t api;
 
-	struct sensors_scheduler_subscriber_t *subscriber;
 	float distance;
 	uint64_t delay;
 };
