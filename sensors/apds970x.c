@@ -30,8 +30,6 @@
 
 #define PROXIMITY_DEV_NAME "apds9702"
 #define THRESH_DEFAULT   5
-#define BURST_DEFAULT    1
-#define BURST_THRESHOLD_MIN 2
 #define PATH_SIZE      100
 #define UN_INIT         -1
 
@@ -52,10 +50,6 @@ struct sensor_desc {
 	int th_det;
 	int th_not_det;
 	char th_path[PATH_SIZE];
-
-	int burst_det;
-	int burst_not_det;
-	char burst_path[PATH_SIZE];
 };
 
 static struct sensor_desc apds970x = {
@@ -76,7 +70,6 @@ static struct sensor_desc apds970x = {
 		.close = apds9700_close
 	},
 	.th_not_det = UN_INIT,
-	.burst_not_det = UN_INIT,
 };
 
 static void apds9700_init_threshold_members(struct sensor_desc *d, int fd_input)
@@ -121,59 +114,6 @@ exit_with_defaults:
 	d->th_det = THRESH_DEFAULT - 1;
 }
 
-static void apds9700_init_burst_members(struct sensor_desc *d, int fd_input)
-{
-	char buf[PATH_SIZE];
-	int fd_burst;
-	int requested_burst;
-
-	if (d->burst_not_det != UN_INIT)
-		return;
-
-	if (ioctl(fd_input, EVIOCGPHYS(sizeof(buf)), buf) < 0 ||
-	    snprintf(d->burst_path, sizeof(d->burst_path),
-		"%s/nburst", buf) < 0) {
-		ALOGE("%s: getting device physical path failed (%s)\n",
-		     __func__, strerror(errno));
-		goto exit_with_defaults;
-	}
-
-	fd_burst = open(d->burst_path, O_RDONLY);
-	if (fd_burst < 0) {
-		ALOGE("%s: opening %s for read failed (%s)\n",
-		     __func__, d->burst_path, strerror(errno));
-		ALOGE("burst path error read error\n");
-		goto exit_with_defaults;
-	}
-
-	if (read(fd_burst, buf, sizeof(buf)) < 0) {
-		close(fd_burst);
-		goto exit_with_defaults;
-	}
-
-	requested_burst = atoi(buf);
-
-	if (0 > requested_burst || 31 < requested_burst)
-		requested_burst = BURST_DEFAULT;
-
-	if (15 < requested_burst) {
-		d->burst_not_det = 17;
-		d->burst_det = requested_burst;
-	} else {
-		d->burst_det = requested_burst;
-		d->burst_not_det = requested_burst;
-	}
-
-	close(fd_burst);
-	return;
-
-exit_with_defaults:
-	ALOGE("Default burst path error\n");
-	d->burst_path[0] = 0;
-	d->burst_not_det = BURST_DEFAULT;
-	d->burst_det = BURST_DEFAULT - 1;
-}
-
 static void apds9700_change_threshold(struct sensor_desc *d)
 {
 	int fd_th;
@@ -194,32 +134,6 @@ static void apds9700_change_threshold(struct sensor_desc *d)
 		if (cnt > 0 && cnt < sizeof(th_new_c))
 			write(fd_th, th_new_c, cnt + 1);
 		close(fd_th);
-	}
-}
-
-static void apds9700_change_burst(struct sensor_desc *d)
-{
-	int fd_burst;
-
-	if (d->burst_path[0] == 0)
-		return;
-
-	fd_burst = open(d->burst_path, O_WRONLY);
-	if (fd_burst < 0) {
-		ALOGE("%s: opening %s for write failed (%s)\n",
-		     __func__, d->burst_path, strerror(errno));
-	} else {
-		int burst_new = (d->distance == 0.0)
-			? d->burst_det : d->burst_not_det;
-
-		char burst_new_c[10];
-		unsigned int cnt = snprintf(burst_new_c,
-			sizeof(burst_new_c), "%d", burst_new);
-
-		if (cnt > 0 && cnt < sizeof(burst_new_c))
-			write(fd_burst, burst_new_c, cnt + 1);
-
-		close(fd_burst);
 	}
 }
 
@@ -259,7 +173,6 @@ static int apds9700_activate(struct sensor_api_t *s, int enable)
 			LOGW("%s: unable to enable wake locks\n", __func__);
 #endif
 		apds9700_init_threshold_members(d, fd);
-		apds9700_init_burst_members(d, fd);
 		d->select_worker.set_fd(&d->select_worker, fd);
 		d->select_worker.resume(&d->select_worker);
 	} else if (!enable && (fd > 0)) {
@@ -293,8 +206,6 @@ static void apds9700_close(struct sensor_api_t *s)
 static void apds9700_store_dist(struct sensor_desc *d, int value)
 {
 	d->distance = value ? 1.0 : 0.0;
-	if (d->burst_not_det != d->burst_det)
-		apds9700_change_burst(d);
 	apds9700_change_threshold(d);
 }
 
