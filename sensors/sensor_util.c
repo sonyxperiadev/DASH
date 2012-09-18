@@ -21,7 +21,6 @@
 #include <stddef.h>
 #include <string.h>
 #include <time.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <linux/input.h>
@@ -29,8 +28,7 @@
 #include <dirent.h>
 #include <ctype.h>
 #include "sensors_log.h"
-#include <pthread.h>
-#include "sensor_util_list.h"
+#include "sensors_input_cache.h"
 
 #define NSEC_PER_SEC 1000000000L
 static int64_t timespec_to_ns(const struct timespec *ts)
@@ -61,116 +59,48 @@ void sensors_usleep(int us)
 	nanosleep(&t, NULL);
 }
 
-#define INPUT_EVENT_DIR      "/dev/input/"
-#define INPUT_EVENT_BASENAME "event"
-#define INPUT_EVENT_PATH     INPUT_EVENT_DIR INPUT_EVENT_BASENAME
-#define MAX_INT_STRING_SIZE  sizeof("4294967295")
-static pthread_mutex_t util_mutex = PTHREAD_MUTEX_INITIALIZER;
-struct input_dev_list {
-	struct list_node node;
-	char event_path[sizeof(INPUT_EVENT_PATH) + MAX_INT_STRING_SIZE];
-	char dev_name[32];
-};
-
-static struct list_node head;
-
 int input_dev_path_by_name(char *name, char *path, int path_max)
 {
-	int rc;
-	int fd;
-	DIR * dir;
-	struct dirent * item;
-	struct list_node *member;
-	struct input_dev_list *temp;
-	static int init;
+	const struct sensors_input_cache_entry_t *input;
 
-	pthread_mutex_lock(&util_mutex);
-	if (!init) {
-		init = 1;
-		dir = opendir(INPUT_EVENT_DIR);
-		if (!dir)
-			goto opendir_err;
-		node_init(&head);
-		while (NULL != (item = readdir(dir))) {
-			if (0 != strncmp(item->d_name, INPUT_EVENT_BASENAME,
-				sizeof(INPUT_EVENT_BASENAME) - 1)) {
-				continue;
-			}
-			temp = malloc(sizeof(*temp));
-			if (temp == NULL) {
-				ALOGE("%s: malloc error!\n", __func__);
-				goto malloc_err;
-			}
+	input = sensors_input_cache_get(name);
+	if (!input)
+		return -1;
 
-			node_add(&head, &temp->node);
+	strlcpy(path, input->event_path, path_max);
 
-			snprintf(temp->event_path, sizeof(temp->event_path),
-						"%s%s",
-						INPUT_EVENT_DIR, item->d_name);
-			fd = open(temp->event_path, O_RDONLY);
-			if (fd < 0)
-				goto open_err;
-
-			rc = ioctl(fd,
-				EVIOCGNAME(sizeof(temp->dev_name)),
-				temp->dev_name);
-			close(fd);
-			if (rc < 0)
-				goto open_err;
-		}
-		closedir(dir);
-	}
-	pthread_mutex_unlock(&util_mutex);
-
-	for (member = head.n; member != &head; member = member->n) {
-		temp = container_of(member, struct input_dev_list, node);
-		if (!strcmp(temp->dev_name, name)) {
-			strncpy(path, temp->event_path, path_max);
-			return 0;
-		}
-	}
-
-	return -1;
-
-malloc_err:
-open_err:
-	for (member = head.n; member != &head; member = head.n) {
-		temp = container_of(member, struct input_dev_list, node);
-		node_del(member);
-		free(temp);
-	}
-	closedir(dir);
-opendir_err:
-	pthread_mutex_unlock(&util_mutex);
-	return -1;
+	return 0;
 }
 
 int open_input_dev_by_name(char *name, int flags)
 {
-	char fname[sizeof(INPUT_EVENT_PATH) + MAX_INT_STRING_SIZE];
+	const struct sensors_input_cache_entry_t *input;
 
-	if (!input_dev_path_by_name(name, fname, sizeof(fname)))
-		return open(fname, flags);
+	input = sensors_input_cache_get(name);
+	if (!input)
+		return -1;
 
-	return -1;
+	return open(input->event_path, flags);
 }
 
 int open_input_dev_by_name_store_nr(char *name, int flags, char *nr,
 							size_t nr_size)
 {
-	char fname[sizeof(INPUT_EVENT_PATH) + MAX_INT_STRING_SIZE];
+	const struct sensors_input_cache_entry_t *input;
+	size_t len;
 
-	if (!input_dev_path_by_name(name, fname, sizeof(fname))) {
-		size_t len = strnlen(fname, sizeof(fname));
-		while(iscntrl(fname[len]))
-			len--;
-		while(isdigit(fname[len]))
-			len--;
-		nr = strncpy(nr, &fname[len+1], nr_size);
-		return open(fname, flags);
-	}
+	input = sensors_input_cache_get(name);
+	if (!input)
+		return -1;
 
-	return -1;
+	len = strnlen(input->event_path, sizeof(input->event_path));
+	while(iscntrl(input->event_path[len]))
+		len--;
+	while(isdigit(input->event_path[len]))
+		len--;
+	strncpy(nr, &input->event_path[len+1], nr_size);
+
+	return open(input->event_path, flags);
 }
 
 #define test_bit(bit, array)    (array[(bit) / 8] & (1 << ((bit) % 8)))
