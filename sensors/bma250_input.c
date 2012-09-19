@@ -28,6 +28,7 @@
 #include "sensor_util.h"
 #include "sensors_id.h"
 #include "sensors_config.h"
+#include "sensors_sysfs.h"
 
 #define BMA250_INPUT_NAME "bma250"
 #define NR_MAX_SIZE 4
@@ -48,6 +49,7 @@ static void *bma250_input_read(void *arg);
 
 struct sensor_desc {
 	struct sensors_select_t select_worker;
+	struct sensors_sysfs_t sysfs;
 	struct sensor_t sensor;
 	struct sensor_api_t api;
 
@@ -172,7 +174,10 @@ static int bma250_input_init(struct sensor_api_t *s)
 		return -1;
 	}
 	close(fd);
+
+	sensors_sysfs_init(&d->sysfs, BMA250_INPUT_NAME, SYSFS_TYPE_INPUT_DEV);
 	sensors_select_init(&d->select_worker, bma250_input_read, s, -1);
+
 	return 0;
 }
 
@@ -203,91 +208,33 @@ static int bma250_input_set_delay(struct sensor_api_t *s, int64_t ns)
 {
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd = d->select_worker.get_fd(&d->select_worker);
-	const int sysfs_max = 64;
-	char sysfs_path[sysfs_max];
-	const char *path = "sys/class/input/input";
-	const int buf_max = 16;
-	char buf[buf_max];
-	int sysfs_fd, count, len;
 	unsigned int ms = ns/(1000*1000);
+	int ret;
 
 	d->delay = ns;
 	d->select_worker.set_delay(&d->select_worker, ns);
 
 	/* rate */
-	count = snprintf(sysfs_path, sysfs_max, "%s%s/bma250_rate",
-					path, bma250_input.nr);
-	if ((count < 0) || (count >= sysfs_max))
-		goto snprintf_error;
-
-	sysfs_fd = open(sysfs_path, O_RDWR);
-	if (sysfs_fd < 0)
-		goto open_error;
-
-	count = snprintf(buf, buf_max, "%d\n", ms);
-	if ((count < 0) || (count >= buf_max))
-		goto snprintf_error;
-
-	len = write(sysfs_fd, buf, count + 1);
-	close(sysfs_fd);
-	if (len < 0)
-		goto write_error;
+	ret = d->sysfs.write_int(&d->sysfs, "bma250_rate", ms);
+	if (ret < 0) {
+		LOGE("%s: sysfs.write_int failed!\n", __func__);
+		return ret;
+	}
 
 	/* range */
-	count = snprintf(sysfs_path, sysfs_max, "%s%s/bma250_range",
-					path, bma250_input.nr);
-	if ((count < 0) || (count >= sysfs_max))
-		goto snprintf_error;
-
-	sysfs_fd = open(sysfs_path, O_RDWR);
-	if (sysfs_fd < 0)
-		goto open_error;
-
-	count = snprintf(buf, buf_max, "2\n");
-	if ((count < 0) || (count >= buf_max))
-		goto snprintf_error;
-
-	len = write(sysfs_fd, buf, count + 1);
-	close(sysfs_fd);
-	if (len < 0)
-		goto write_error;
+	ret = d->sysfs.write_int(&d->sysfs, "bma250_range", 2);
+	if (ret < 0) {
+		LOGE("%s: sysfs.write_int failed!\n", __func__);
+		return ret;
+	}
 
 	/* resolution */
-	count = snprintf(sysfs_path, sysfs_max, "%s%s/bma250_resolution",
-					path, bma250_input.nr);
-	if ((count < 0) || (count >= sysfs_max))
-		goto snprintf_error;
+	ret = d->sysfs.write_int(&d->sysfs, "bma250_resolution",
+		(ms > 50) ? 0 : 1);
+	if (ret < 0)
+		ALOGE("%s: sysfs.write_int failed!\n", __func__);
 
-	sysfs_fd = open(sysfs_path, O_RDWR);
-	if (sysfs_fd < 0)
-		goto open_error;
-
-	if (ms > 50)
-		count = snprintf(buf, buf_max, "0\n");
-	else
-		count = snprintf(buf, buf_max, "1\n");
-	if ((count < 0) || (count >= buf_max))
-		goto snprintf_error;
-
-	len = write(sysfs_fd, buf, count + 1);
-	close(sysfs_fd);
-	if (len < 0)
-		goto write_error;
-
-	return 0;
-
-snprintf_error:
-	ALOGE("%s: snprintf failed, invalid count %d\n", __func__, count);
-	return -1;
-
-open_error:
-	ALOGE("%s: open %s failed, error: %s\n", __func__, sysfs_path,
-		strerror(errno));
-	return sysfs_fd;
-
-write_error:
-	ALOGE("%s: write %s failed, error: %d\n", __func__, sysfs_path, len);
-	return len;
+	return ret;
 }
 
 static void bma250_input_close(struct sensor_api_t *s)
