@@ -21,6 +21,7 @@
 #include "sensor_api.h"
 
 #define MAX_SENSOR_CONNECTIONS 4
+#define NO_RATE		(-1)
 
 /* Android sensor HAL types and functions */
 struct wrapper_access {

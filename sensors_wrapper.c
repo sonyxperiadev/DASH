@@ -23,7 +23,6 @@
 #include "sensor_util.h"
 #include "sensors_wrapper.h"
 
-#define NO_RATE		(-1)
 #define UNUSED		0
 #define CLOSE		0x1
 #define INIT		0x2
