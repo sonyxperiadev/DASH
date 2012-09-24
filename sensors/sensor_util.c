@@ -83,26 +83,6 @@ int open_input_dev_by_name(char *name, int flags)
 	return open(input->event_path, flags);
 }
 
-int open_input_dev_by_name_store_nr(char *name, int flags, char *nr,
-							size_t nr_size)
-{
-	const struct sensors_input_cache_entry_t *input;
-	size_t len;
-
-	input = sensors_input_cache_get(name);
-	if (!input)
-		return -1;
-
-	len = strnlen(input->event_path, sizeof(input->event_path));
-	while(iscntrl(input->event_path[len]))
-		len--;
-	while(isdigit(input->event_path[len]))
-		len--;
-	strncpy(nr, &input->event_path[len+1], nr_size);
-
-	return open(input->event_path, flags);
-}
-
 #define test_bit(bit, array)    (array[(bit) / 8] & (1 << ((bit) % 8)))
 #define bit_array_size(bit)     (((bit) + 7) / 8)
 int input_dev_path_by_keycode(int type, int code, char *path, int path_max)

@@ -33,8 +33,6 @@ void sensors_nsleep(int64_t ns);
 void sensors_usleep(int us);
 int64_t get_current_nano_time();
 int open_input_dev_by_name(char *name, int flags);
-int open_input_dev_by_name_store_nr(char *name, int flags, char *nr,
-							size_t nr_size);
 int input_dev_path_by_name(char *name, char *path, int path_max);
 int input_dev_path_by_keycode(int type, int code, char *path, int path_max);
 int dev_phys_path_by_attr(const char *attr, const char *attr_val,

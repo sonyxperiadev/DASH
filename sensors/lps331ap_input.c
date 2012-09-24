@@ -30,8 +30,6 @@
 #include "sensors_sysfs.h"
 
 #define LPS331AP_PRS_DEV_NAME "lps331ap_prs_sysfs"
-
-#define NR_MAX_SIZE 4
 #define NR_SAMPLES 16
 #define ROW_TO_MBAR_SCALE 4096.0
 
@@ -48,7 +46,6 @@ struct sensor_desc {
 	struct sensor_api_t api;
 	long current_data[2];
 	int64_t delay;
-	char nr[NR_MAX_SIZE];
 	long mem[NR_SAMPLES];
 	int current_sample;
 	int num_samples;
@@ -76,8 +73,7 @@ static int lps331ap_input_init(struct sensor_api_t *s)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd;
 
-	fd = open_input_dev_by_name_store_nr(LPS331AP_PRS_DEV_NAME,
-		O_RDONLY | O_NONBLOCK, lps331ap_pressure_input.nr, NR_MAX_SIZE);
+	fd = open_input_dev_by_name(LPS331AP_PRS_DEV_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
 		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, LPS331AP_PRS_DEV_NAME, strerror(errno));
@@ -98,9 +94,8 @@ static int lps331ap_input_activate(struct sensor_api_t *s, int enable)
 
 	/* suspend/resume will be handled in kernel-space */
 	if (enable && (fd < 0)) {
-		fd = open_input_dev_by_name_store_nr(LPS331AP_PRS_DEV_NAME,
-			O_RDONLY | O_NONBLOCK, lps331ap_pressure_input.nr,
-			NR_MAX_SIZE);
+		fd = open_input_dev_by_name(LPS331AP_PRS_DEV_NAME,
+			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
 			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, LPS331AP_PRS_DEV_NAME,

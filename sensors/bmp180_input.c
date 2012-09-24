@@ -30,7 +30,6 @@
 #include "sensors_sysfs.h"
 
 #define BMP180_INPUT_NAME "bmp180"
-#define NR_MAX_SIZE 4
 
 static int bmp180_input_init(struct sensor_api_t *s);
 static int bmp180_input_activate(struct sensor_api_t *s, int enable);
@@ -45,7 +44,6 @@ struct sensor_desc {
 	struct sensor_api_t api;
 	float current_data[2];
 	int64_t delay;
-	char nr[NR_MAX_SIZE];
 };
 
 static struct sensor_desc bmp180_pressure_input = {
@@ -72,8 +70,7 @@ static int bmp180_input_init(struct sensor_api_t *s)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd;
 
-	fd = open_input_dev_by_name_store_nr(BMP180_INPUT_NAME,
-		O_RDONLY | O_NONBLOCK, bmp180_pressure_input.nr, NR_MAX_SIZE);
+	fd = open_input_dev_by_name(BMP180_INPUT_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
 		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, BMP180_INPUT_NAME, strerror(errno));
@@ -94,9 +91,8 @@ static int bmp180_input_activate(struct sensor_api_t *s, int enable)
 
 	/* suspend/resume will be handled in kernel-space */
 	if (enable && (fd < 0)) {
-		fd = open_input_dev_by_name_store_nr(BMP180_INPUT_NAME,
-			O_RDONLY | O_NONBLOCK, bmp180_pressure_input.nr,
-			NR_MAX_SIZE);
+		fd = open_input_dev_by_name(BMP180_INPUT_NAME,
+			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
 			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, BMP180_INPUT_NAME, strerror(errno));

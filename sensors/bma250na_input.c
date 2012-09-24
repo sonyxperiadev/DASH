@@ -32,7 +32,6 @@
 #include "sensors_sysfs.h"
 
 #define BMA250_INPUT_NAME "bma250"
-#define NR_MAX_SIZE 4
 
 static int bma250_input_init(struct sensor_api_t *s);
 static int bma250_input_activate(struct sensor_api_t *s, int enable);
@@ -50,7 +49,6 @@ struct sensor_desc {
 	int input_fd;
 	int current_data[3];
 	int64_t delay;
-	char nr[NR_MAX_SIZE];
 
 	/* config options */
 	int axis_x;
@@ -152,8 +150,7 @@ static int bma250_input_init(struct sensor_api_t *s)
 	int fd;
 	bma250_input_read_config(d);
 
-	fd = open_input_dev_by_name_store_nr(BMA250_INPUT_NAME,
-			O_RDONLY | O_NONBLOCK, bma250_input.nr, NR_MAX_SIZE);
+	fd = open_input_dev_by_name(BMA250_INPUT_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
 		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, BMA250_INPUT_NAME, strerror(errno));
@@ -174,8 +171,8 @@ static int bma250_input_activate(struct sensor_api_t *s, int enable)
 
 	/* suspend/resume will be handled in kernel-space */
 	if (enable && (fd < 0)) {
-		fd = open_input_dev_by_name_store_nr(BMA250_INPUT_NAME,
-			O_RDONLY | O_NONBLOCK, bma250_input.nr, NR_MAX_SIZE);
+		fd = open_input_dev_by_name(BMA250_INPUT_NAME,
+			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
 			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, BMA250_INPUT_NAME, strerror(errno));
