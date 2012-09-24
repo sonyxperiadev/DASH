@@ -119,6 +119,11 @@ endif
 #
 # Gyro sensors
 #
+ifeq ($(SOMC_CFG_SENSORS_GYRO_MPU3050),yes)
+DASH_SENSORS_SHARED_LIBS += libMPU3050
+DASH_SENSORS_CFLAGS += -I$(LOCAL_PATH)/libs/mpu3050/libsensors
+DASH_SENSORS += mpu3050.c
+endif
 
 ifeq ($(SOMC_CFG_SENSORS_GYRO_L3G4200D),yes)
 ifneq ($(DASH_ST_LSM303DLHX_ENABLE),yes)
