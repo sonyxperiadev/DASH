@@ -217,14 +217,14 @@ static int bma250_input_set_delay(struct sensor_api_t *s, int64_t ns)
 	/* rate */
 	ret = d->sysfs.write_int(&d->sysfs, "bma250_rate", ms);
 	if (ret < 0) {
-		LOGE("%s: sysfs.write_int failed!\n", __func__);
+		ALOGE("%s: sysfs.write_int failed!\n", __func__);
 		return ret;
 	}
 
 	/* range */
 	ret = d->sysfs.write_int(&d->sysfs, "bma250_range", 2);
 	if (ret < 0) {
-		LOGE("%s: sysfs.write_int failed!\n", __func__);
+		ALOGE("%s: sysfs.write_int failed!\n", __func__);
 		return ret;
 	}
 

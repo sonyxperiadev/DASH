@@ -77,7 +77,7 @@ const struct sensors_input_cache_entry_t *sensors_input_cache_get(
 
 	dir = opendir(INPUT_EVENT_DIR);
 	if (!dir) {
-		LOGE("%s: error opening '%s'\n", __func__,
+		ALOGE("%s: error opening '%s'\n", __func__,
 				INPUT_EVENT_DIR);
 		goto exit;
 	}
@@ -90,7 +90,7 @@ const struct sensors_input_cache_entry_t *sensors_input_cache_get(
 
 		temp = (temp ? temp : malloc(sizeof(*temp)));
 		if (temp == NULL) {
-			LOGE("%s: malloc error!\n", __func__);
+			ALOGE("%s: malloc error!\n", __func__);
 			break;
 		}
 
@@ -103,7 +103,7 @@ const struct sensors_input_cache_entry_t *sensors_input_cache_get(
 		/* make sure we have access */
 		fd = open(temp->entry.event_path, O_RDONLY);
 		if (fd < 0) {
-			LOGE("%s: cant open %s", __func__,
+			ALOGE("%s: cant open %s", __func__,
 			     item->d_name);
 			continue;
 		}
@@ -116,7 +116,7 @@ const struct sensors_input_cache_entry_t *sensors_input_cache_get(
 				close_input_dev_fd, (void*) fd);
 
 		if (rc < 0) {
-			LOGE("%s: cant get name from  %s", __func__,
+			ALOGE("%s: cant get name from  %s", __func__,
 					item->d_name);
 			continue;
 		}

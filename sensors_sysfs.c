@@ -18,20 +18,20 @@ static int sensors_sysfs_write(struct sensors_sysfs_t* s, const char* attribute,
 	count = snprintf(sysfs_path, sizeof(sysfs_path), "%s/%s",
 			 s->data.path, attribute);
 	if ((count < 0) || (count >= (int)sizeof(sysfs_path))) {
-		LOGE("%s: snprintf failed! %d\n", __func__, count);
+		ALOGE("%s: snprintf failed! %d\n", __func__, count);
 		return -1;
 	}
 
 	sysfs_fd = open(sysfs_path, O_RDWR);
 	if (sysfs_fd < 0) {
-		LOGE("%s: open failed! %d\n", __func__, sysfs_fd);
+		ALOGE("%s: open failed! %d\n", __func__, sysfs_fd);
 		return sysfs_fd;
 	}
 
 	len = write(sysfs_fd, value, length);
 	close(sysfs_fd);
 	if (len < 0)
-		LOGE("%s: write failed! %d\n", __func__, len);
+		ALOGE("%s: write failed! %d\n", __func__, len);
 
 	return len;
 }
@@ -43,7 +43,7 @@ static int sensors_sysfs_write_int(struct sensors_sysfs_t* s, const char* attrib
 
 	count = snprintf(buf, sizeof(buf), "%lld", value);
 	if ((count < 0) || (count >= (int)sizeof(buf))) {
-		LOGE("%s: snprintf failed! %d\n", __func__, count);
+		ALOGE("%s: snprintf failed! %d\n", __func__, count);
 		return -1;
 	}
 
@@ -60,14 +60,14 @@ int sensors_sysfs_init(struct sensors_sysfs_t* s, const char *str,
 	case SYSFS_TYPE_INPUT_DEV:
 		input = sensors_input_cache_get(str);
 		if (!input) {
-			LOGE("%s: sensors_input_cache_get failed!\n",
+			ALOGE("%s: sensors_input_cache_get failed!\n",
 			      __func__);
 			return -1;
 		}
 		count = snprintf(s->data.path, sizeof(s->data.path), "%s%d",
 				 input_class_path, input->nr);
 		if ((count < 0) || (count >= (int)sizeof(s->data.path))) {
-			LOGE("%s: snprintf failed! %d\n", __func__, count);
+			ALOGE("%s: snprintf failed! %d\n", __func__, count);
 			return -1;
 		}
 		break;
@@ -77,7 +77,7 @@ int sensors_sysfs_init(struct sensors_sysfs_t* s, const char *str,
 		break;
 
 	default:
-		LOGE("%s: unknown type %d\n", __func__, type);
+		ALOGE("%s: unknown type %d\n", __func__, type);
 		return -1;
 	}
 
