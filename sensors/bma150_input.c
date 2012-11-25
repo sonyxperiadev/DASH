@@ -77,7 +77,7 @@ static struct sensor_desc bma150_input = {
 		maxRange: 9.81,
 		resolution: 20,
 		power: 0.13,
-		minDelay: 10000
+		minDelay: 5000
 	},
 	.api = {
 		init: bma150_input_init,
