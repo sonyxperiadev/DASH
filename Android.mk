@@ -33,10 +33,10 @@ LOCAL_CFLAGS += -DLOG_NDEBUG
 LOCAL_CFLAGS += -DDEBUG_VERBOSE=0
 
 include $(LOCAL_PATH)/sensors/Sensors.mk
-LOCAL_SRC_FILES += $(patsubst %,sensors/%, $(DASH_SENSORS))
-LOCAL_CFLAGS += $(DASH_SENSORS_CFLAGS)
-LOCAL_STATIC_LIBRARIES += $(DASH_SENSORS_STATIC_LIBS)
-LOCAL_SHARED_LIBRARIES += $(DASH_SENSORS_SHARED_LIBS)
+LOCAL_SRC_FILES += $(patsubst %,sensors/%, $(yes-files))
+LOCAL_CFLAGS += $(yes-cflags)
+LOCAL_STATIC_LIBRARIES += $(yes-static-libs)
+LOCAL_SHARED_LIBRARIES += $(yes-shared-libs)
 
 LOCAL_MODULE := sensors.default
 LOCAL_MODULE_TAGS := optional
