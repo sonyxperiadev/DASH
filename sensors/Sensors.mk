@@ -17,10 +17,13 @@ $(SOMC_CFG_SENSORS_COMPASS_LSM303DLH)-var-compass-lsm303dlh = yes
 $(SOMC_CFG_SENSORS_COMPASS_LSM303DLHC)-cflags += -DST_LSM303DLHC
 $(SOMC_CFG_SENSORS_COMPASS_LSM303DLHC)-var-compass-lsm303dlh = yes
 
-$(yes-var-compass-lsm303dlh)-files += lsm303dlhx_acc.c \
-				      wrappers/lsm303dlhx_accelerometer.c
+$(yes-var-compass-lsm303dlh)-files += wrappers/lsm303dlhx_accelerometer.c
 $(yes-var-compass-lsm303dlh)-var-xyz = yes
-
+ifeq ($(SOMC_CFG_SENSORS_ACCELEROMETER_LSM303DLHC_LT),yes)
+$(yes-var-compass-lsm303dlh)-files += lsm303dlhc_acc_lt.c
+else
+$(yes-var-compass-lsm303dlh)-files += lsm303dlhx_acc.c
+endif
 
 #
 # Compasses
