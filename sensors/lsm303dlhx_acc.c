@@ -45,6 +45,9 @@ static struct sensor_desc accelerometer = {
 	.dev_attr_rate_ms = "pollrate_ms",
 	.dev_attr_range_mg = "range",
 	.dev_attr_mode = NULL,
+	.ev_type_data = EV_ABS,
+	.ev_type_sync = EV_SYN,
+	.ev_code = {ABS_X, ABS_Y, ABS_Z},
 };
 
 #elif ST_LSM303DLHC
@@ -82,6 +85,9 @@ static struct sensor_desc accelerometer = {
 		[MODE_UI]      = "poll",
 		[MODE_NORMAL]  = "poll",
 	},
+	.ev_type_data = EV_ABS,
+	.ev_type_sync = EV_SYN,
+	.ev_code = {ABS_X, ABS_Y, ABS_Z},
 };
 #else
 #error "ST_LSM303DLH or ST_LSM303DLHC define is required!"

@@ -83,6 +83,9 @@ struct sensor_desc {
 	char *dev_attr_range_mg;
 	char *dev_attr_mode;
 	char *dev_modes[NUM_MODES];
+	unsigned short ev_type_data;
+	unsigned short ev_type_sync;
+	unsigned short ev_code[NUM_AXIS];
 };
 
 int sensor_xyz_init(struct sensor_api_t *s_api);

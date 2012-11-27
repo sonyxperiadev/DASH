@@ -44,6 +44,9 @@ static struct sensor_desc gyroscope = {
 	.dev_attr_rate_ms = "pollrate_ms",
 	.dev_attr_range_mg = "range",
 	.dev_attr_mode = NULL,
+	.ev_type_data = EV_ABS,
+	.ev_type_sync = EV_SYN,
+	.ev_code = {ABS_X, ABS_Y, ABS_Z},
 };
 
 list_constructor(lsm303dlh_gyroscope);

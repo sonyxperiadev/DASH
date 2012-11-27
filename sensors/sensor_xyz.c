@@ -282,24 +282,17 @@ void *sensor_xyz_read(void *arg)
 	n = n / sizeof(events[0]);
 	for (i = 0; i < n; i++) {
 		e = events + i;
-		if (e->type == EV_ABS) {
-			switch (e->code) {
-			case ABS_X:
+		if (e->type == p->ev_type_data) {
+			if (e->code == p->ev_code[AXIS_X])
 				p->data[p->map[AXIS_X]] =
 					e->value * p->sign[AXIS_X];
-				break;
-			case ABS_Y:
+			else if (e->code == p->ev_code[AXIS_Y])
 				p->data[p->map[AXIS_Y]] =
 					e->value * p->sign[AXIS_Y];
-				break;
-			case ABS_Z:
+			else if (e->code == p->ev_code[AXIS_Z])
 				p->data[p->map[AXIS_Z]] =
 					e->value * p->sign[AXIS_Z];
-				break;
-			default:
-				break;
-			}
-		} else if (e->type == EV_SYN) {
+		} else if (e->type == p->ev_type_sync) {
 			sd.sensor = &p->sensor;
 			sd.data = p->data;
 			sd.size = NUM_AXIS;
