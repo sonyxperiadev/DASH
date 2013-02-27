@@ -36,6 +36,7 @@ LOCAL_CFLAGS += -DDEBUG_VERBOSE=0
 include $(LOCAL_PATH)/sensors/Sensors.mk
 LOCAL_SRC_FILES += $(patsubst %,sensors/%, $(yes-files))
 LOCAL_CFLAGS += $(yes-cflags)
+LOCAL_C_INCLUDES += $(yes-c-includes)
 LOCAL_STATIC_LIBRARIES += $(yes-static-libs)
 LOCAL_SHARED_LIBRARIES += $(yes-shared-libs)
 
