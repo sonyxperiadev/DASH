@@ -21,8 +21,8 @@
 #include "sensor_xyz.h"
 
 #if defined(AK8963)
-#include <linux/akm8963.h>
-#include "libs/akm8963/SEMC_APIs.h"
+#include "../libs/akm8963/linux/akm8963.h"
+#include "../libs/akm8963/SEMC_APIs.h"
 #else
 #error No AKM chip is defined
 #endif
