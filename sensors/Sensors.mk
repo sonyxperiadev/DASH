@@ -124,7 +124,7 @@ $(SOMC_CFG_SENSORS_GYRO_L3G4200D)-var-xyz = yes
 #
 ifeq ($(SOMC_CFG_SENSORS_GYRO_L3G4200D),yes)
 $(yes-var-compass-lsm303dlh)-files += wrappers/inemo.c
-$(yes-var-compass-lsm303dlh)-static-libs += iNemoEngine eCompassAPI eCompass libSpacePointAPI_opt2_1
+$(yes-var-compass-lsm303dlh)-static-libs += iNemoEngine
 $(yes-var-compass-lsm303dlh)-cflags += -O3 -DUSE_MMAP
 $(yes-var-compass-lsm303dlh)-c-includes += $(LOCAL_PATH)/libs/inemo \
 		$(LOCAL_PATH)/libs/inemo/lib/sensors_compass_API \
