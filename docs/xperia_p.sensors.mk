@@ -1,0 +1,16 @@
+#
+# This is the DASH configuration makefile for Xperia P.
+#
+
+# ST-iNemo
+SOMC_CFG_SENSORS_COMPASS_LSM303DLHC := yes
+SOMC_CFG_SENSORS_ACCELEROMETER_LSM303DLHC_LT := yes
+SOMC_CFG_SENSORS_GYRO_L3G4200D := yes
+
+# Proximity Sensor
+SOMC_CFG_SENSORS_PROXIMITY_NOA3402 := yes
+SOMC_CFG_SENSORS_PROXIMITY_NOA3402_PATH := /sys/devices/platform/nmk-i2c.2/i2c-2/2-0037/prox
+SOMC_CFG_SENSORS_PROXIMITY_TLS2772 := yes
+
+# configure light sensor
+SOMC_CFG_SENSORS_LIGHT_RANGE := 50000
