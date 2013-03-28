@@ -67,6 +67,12 @@ $(yes-var-compass-ak896xna)-files += ak896xna.c wrappers/ak896xna_sensors.c
 #
 # Light sensors
 #
+
+$(SOMC_CFG_SENSORS_LIGHT_AS3676)-files += as3676_als.c
+$(SOMC_CFG_SENSORS_LIGHT_AS3676)-cflags += \
+    -DALS_CHIP_MAXRANGE=$(if $(SOMC_CFG_SENSORS_LIGHT_AS3676_MAXRANGE),$(SOMC_CFG_SENSORS_LIGHT_AS3676_MAXRANGE),4900) \
+    -DALS_PATH=\"$(SOMC_CFG_SENSORS_LIGHT_AS3676_PATH)\"
+
 $(SOMC_CFG_SENSORS_LIGHT_LIBALS)-files += light_sensor_als.c
 $(SOMC_CFG_SENSORS_LIGHT_LIBALS)-c-includes += $(DASH_ROOT)/libs/libals
 $(SOMC_CFG_SENSORS_LIGHT_LIBALS)-shared-libs += libals
