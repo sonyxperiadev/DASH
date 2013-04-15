@@ -14,8 +14,6 @@
 #include "sensors_id.h"
 #include "sensors_sysfs.h"
 
-#define LM3533_DEV "/sys/devices/i2c-0/0-0036/"
-
 static struct sensor_desc light_sensor;
 
 struct sensor_desc {
@@ -121,7 +119,7 @@ static struct sensor_desc light_sensor = {
         .version = sizeof(sensors_event_t),
         .handle = SENSOR_LIGHTSENSOR_HANDLE,
         .type = SENSOR_TYPE_LIGHT,
-        .maxRange = 1530,
+        .maxRange = ALS_CHIP_MAXRANGE,
         .resolution = 1.0,
         .power = 1
     },
