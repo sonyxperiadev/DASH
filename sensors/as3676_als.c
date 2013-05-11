@@ -22,18 +22,16 @@ struct sensor_desc {
 	int fd;
 };
 
-
 static void *light_poll(void *arg)
 {
 	struct sensor_desc *d = container_of(arg, struct sensor_desc, worker);
 	sensors_event_t data;
 	char buf[20];
-	ssize_t n;
 	int lux;
 
 	memset(&data, 0, sizeof(data));
 
-	n = pread(d->fd, buf, sizeof(buf), 0);
+	pread(d->fd, buf, sizeof(buf), 0);
 
 	/*convert to lux value*/
 	lux = atof(buf)*12;
