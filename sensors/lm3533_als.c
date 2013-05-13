@@ -115,7 +115,7 @@ static void light_close(struct sensor_api_t *s)
 static struct sensor_desc light_sensor = {
     .sensor = {
         .name = "LM3533 based light sensor",
-        .vendor = "The CyanogenMod Project",
+        .vendor = "Texas Instruments",
         .version = sizeof(sensors_event_t),
         .handle = SENSOR_LIGHTSENSOR_HANDLE,
         .type = SENSOR_TYPE_LIGHT,
