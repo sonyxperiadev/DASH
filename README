@@ -1,7 +1,7 @@
 		Dynamic Android Sensor HAL
 		      D * A * S * H
 
-Copyright (C) Sony Mobile Communication 2012
+Copyright (C) Sony Mobile Communications 2012
 
 
 Table of contents
@@ -21,7 +21,7 @@ to enable sensors at compile-time it's simply a matter of specifying which
 sensors the product uses.
 
 The implementation also adds support for configuring the sensors at run-time
-using a configuration file. This makes it possible to, e.g. setting PCB mounting
+using a configuration file. This makes it possible to, e.g. set PCB mounting
 coordinates of the sensors.
 
 The DASH is the only sensor HAL implementation that is needed and hence the
@@ -66,7 +66,7 @@ sensor list (see Sensor list). This is done using the macro list_constructor().
 Each sensor implementation will create a thread using either a sensor worker
 (see Polling sensor) or a select thread (see Interrupt driven sensor).
 
-When data has been collected it is written to the fifo by issuing a
+When data has been collected it is written to the FIFO by issuing a
 sensors_fifo_put-call.
 
 In the file sensor_util.c some generic helper functions have been gathered.
@@ -76,7 +76,7 @@ In the file sensor_util.c some generic helper functions have been gathered.
 File: sensors_worker.c
 
 A polling sensor implementation has to own its own thread since each sensor
-can run at a different poll rate. A thread is created by instanciating a sensor
+can run at a different poll rate. A thread is created by instantiating a sensor
 worker using sensors_worker_init().
 
 The sensors_worker will then call the provided work_func at the delay specified
@@ -86,10 +86,10 @@ by the set_delay()-call.
 2.6 Interrupt driven sensor
 File: sensors_select.c
 
-An interrupt driven sensor can report data when it gets an interrupt that there
+An interrupt-driven sensor can report data when it gets an interrupt that there
 is new data to be collected. This can save some clock cycles and battery time.
 
-By instanciating a sensors_select-worker by calling sensors_select_init(), one
+By instantiating a sensors_select-worker by calling sensors_select_init(), one
 will get a call to the select_func when there is new data to be read on the
 provided file descriptor.
 
@@ -107,10 +107,10 @@ A sensor implementation reads out the value with the function
 sensors_config_get_key().
 
 
-2.8 Some utilitiy stuff
+2.8 Some utility stuff
 File: sensors/sensor_util.c
 
-In the file sensor_util there are some code to be used by the sensor
+In the file sensor_util there is some code to be used by the sensor
 implementations. It contains code for transforming coordinates and some
 functions for reading time.
 
@@ -119,7 +119,7 @@ functions for reading time.
 Directory: libs/
 
 Some sensors need vendor libraries to calibrate their output. These will
-put in the libs directory.
+be put in the libs directory.
 
 
 2.10 ASCII Design
@@ -151,4 +151,4 @@ put in the libs directory.
 ---------
 
 The license for all code in this project is specified in the NOTICE file.
-Please, refer to this file for further details.
+Please refer to this file for further details.
