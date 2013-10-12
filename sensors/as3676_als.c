@@ -12,11 +12,13 @@
 #include "sensors_worker.h"
 #include "sensor_util.h"
 #include "sensors_id.h"
+#include "sensors_sysfs.h"
 
 static struct sensor_desc light_sensor;
 
 struct sensor_desc {
 	struct sensors_worker_t worker;
+	struct sensors_sysfs_t sysfs;
 	struct sensor_t sensor;
 	struct sensor_api_t api;
 	int fd;
@@ -52,27 +54,43 @@ static int light_init(struct sensor_api_t *s)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 
 	sensors_worker_init(&d->worker, light_poll, &d->worker);
+	sensors_sysfs_init(&d->sysfs, AS3676_DEV, SYSFS_TYPE_ABS_PATH);
 
 	return 0;
 }
 
 static int light_activate(struct sensor_api_t *s, int enable)
 {
+	char result_path[64];
+	int fd_enable;
 	int fd;
+	int count;
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 
 	if (enable) {
-		fd = open(ALS_PATH, O_RDONLY);
-		if (fd <0) {
-			ALOGE("%s: failed to open as3676: %s\n",__func__, ALS_PATH);
+		d->sysfs.write_int(&d->sysfs, "als_on", 1);
+
+		count = snprintf(result_path, sizeof(result_path), "%s/%s",
+			 AS3676_DEV, "adc_als_value");
+		if ((count < 0) || (count >= (int)sizeof(result_path))) {
+			ALOGE("%s: snprintf failed! %d\n", __func__, count);
 			return -1;
 		}
+
+		fd = open(result_path, O_RDONLY);
+		if (fd < 0) {
+			ALOGE("%s: failed to open sysfs %s, error: %s\n",
+			__func__, result_path, strerror(errno));
+			return -1;
+		}
+
 		d->fd = fd;
 		d->worker.resume(&d->worker);
 	} else {
 		d->worker.suspend(&d->worker);
 		close(d->fd);
 		d->fd = -1;
+		d->sysfs.write_int(&d->sysfs, "als_on", 0);
 	}
 
 	return 0;
