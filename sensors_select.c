@@ -45,12 +45,15 @@ static void *sensors_select_callback(void *arg)
 	int ret;
 	struct sensors_select_t *s = arg;
 	int maxfd;
+	int fd;
 
 	LOCK(&s->fd_mutex);
 	maxfd = s->ctl_fds[0] > s->fd ? s->ctl_fds[0] : s->fd;
 	FD_ZERO(&readfds);
 	FD_SET(s->ctl_fds[0], &readfds);
-	FD_SET(s->fd, &readfds);
+	if (s->fd >= 0)
+		FD_SET(s->fd, &readfds);
+	fd = s->fd;
 	UNLOCK(&s->fd_mutex);
 	ret = select(maxfd + 1, &readfds, NULL, NULL, NULL);
 
@@ -59,10 +62,10 @@ static void *sensors_select_callback(void *arg)
 	} else if (ret) {
 		if (FD_ISSET(s->ctl_fds[0], &readfds)) {
 			read(s->ctl_fds[0], &ret, sizeof(ret));
-		} else if (FD_ISSET(s->fd, &readfds)) {
+		} else if (fd >= 0 && FD_ISSET(fd, &readfds)) {
 			LOCK(&wrapper_mutex);
 			LOCK(&s->fd_mutex);
-			if (s->fd >= 0)
+			if (s->fd == fd)
 			    s->select_callback(s->arg);
 			UNLOCK(&s->fd_mutex);
 			UNLOCK(&wrapper_mutex);
