@@ -192,13 +192,18 @@ static int bma250_input_set_delay(struct sensor_api_t *s, int64_t ns)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd = d->select_worker.get_fd(&d->select_worker);
 	int64_t usec = ns / 1000;
+	int ret;
 
 	if (usec < d->sensor.minDelay)
 		usec = d->sensor.minDelay;
 
 	d->delay = usec * 1000;
 	d->select_worker.set_delay(&d->select_worker, d->delay);
-	return d->sysfs.write_int(&d->sysfs, "bma250_rate", usec / 1000);
+	ret = d->sysfs.write_int(&d->sysfs, "bma250_rate", usec / 1000);
+	if (ret < 0)
+		ALOGE("updating bma250_rate failed: %s\n", strerror(-ret));
+
+	return ret;
 }
 
 static void bma250_input_close(struct sensor_api_t *s)
