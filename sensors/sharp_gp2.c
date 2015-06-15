@@ -47,21 +47,21 @@ struct sensor_desc {
 
 static struct sensor_desc sharp_gp2 = {
 	.sensor = {
-		name: "GP2 Proximity",
-		vendor: "Sharp",
-		version: sizeof(sensors_event_t),
-		handle: SENSOR_PROXIMITY_HANDLE,
-		type: SENSOR_TYPE_PROXIMITY,
-		maxRange: 1.0,
-		resolution: 1,
-		power: 20
+		.name = "GP2 Proximity",
+		.vendor = "Sharp",
+		.version = sizeof(sensors_event_t),
+		.handle = SENSOR_PROXIMITY_HANDLE,
+		.type = SENSOR_TYPE_PROXIMITY,
+		.maxRange = 1.0,
+		.resolution = 1.0,
+		.power = 20
 	},
 	.api = {
-		init: sharp_init,
-		activate: sharp_activate,
-		set_delay: sharp_set_delay,
-		close: sharp_close
-	},
+		.init = sharp_init,
+		.activate = sharp_activate,
+		.set_delay = sharp_set_delay,
+		.close = sharp_close
+	}
 };
 
 static int sharp_init(struct sensor_api_t *s)
