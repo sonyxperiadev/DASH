@@ -133,15 +133,13 @@ static void *sharp_read(void *arg)
 	while ((ret = read(fd, &event, sizeof(event))) > 0) {
 		switch (event.type) {
 		case EV_ABS:
-			switch (event.code) {
-			case ABS_DISTANCE:
+			if (event.code == ABS_DISTANCE)
 				d->distance = event.value ? 1.0 : 0.0;
-				break;
-			default:
-				goto exit;
-			}
 			break;
-
+		case EV_SW:
+			if (event.code == SW_FRONT_PROXIMITY)
+				d->distance = event.value ? 0.0 : 1.0;
+			break;
 		case EV_SYN:
 			memset(&data, 0, sizeof(data));
 
@@ -157,14 +155,12 @@ static void *sharp_read(void *arg)
 			/* sleep for delay time */
 			sensors_nsleep(d->delay);
 
-			goto exit;
-
+			break;
 		default:
-			goto exit;
+			break;
 		}
 	}
 
-exit:
 	return NULL;
 }
 
