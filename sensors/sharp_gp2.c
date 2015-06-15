@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sensors_log.h"
-#include <unistd.h>
 #include <fcntl.h>
 #include <linux/input.h>
 #include "sensors_list.h"
@@ -42,7 +41,7 @@ struct sensor_desc {
 	struct sensor_api_t api;
 
 	float distance;
-	uint64_t delay;
+	int64_t delay;
 };
 
 static struct sensor_desc sharp_gp2 = {
@@ -69,10 +68,12 @@ static int sharp_init(struct sensor_api_t *s)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd;
 
-	fd = open_input_dev_by_name(PROXIMITY_DEV_NAME, O_RDONLY);
+	/* check for availability */
+	fd = open_input_dev_by_name(PROXIMITY_DEV_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
-		ALOGE(LOG_TAG" %s: open device failed!", __func__);
-		return -1;
+		ALOGE("%s: unable to find %s input device!\n", __func__,
+			PROXIMITY_DEV_NAME);
+		return fd;
 	}
 	close(fd);
 
@@ -91,7 +92,7 @@ static int sharp_activate(struct sensor_api_t *s, int enable)
 		if (fd < 0) {
 			ALOGE("%s: failed to open input dev %s\n", __func__,
 				PROXIMITY_DEV_NAME);
-			return -1;
+			return fd;
 		}
 #ifdef EVIOCSSUSPENDBLOCK
 		if (ioctl(fd, EVIOCSSUSPENDBLOCK, 1))
@@ -106,7 +107,6 @@ static int sharp_activate(struct sensor_api_t *s, int enable)
 		d->select_worker.set_fd(&d->select_worker, -1);
 		d->select_worker.suspend(&d->select_worker);
 	}
-
 
 	return 0;
 }
@@ -172,4 +172,3 @@ void sharp_init_driver()
 {
 	(void)sensors_list_register(&sharp_gp2.sensor, &sharp_gp2.api);
 }
-
