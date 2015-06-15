@@ -55,7 +55,7 @@ struct sensor_desc {
 static struct sensor_desc apds970x = {
 	.sensor = {
 		.name = PROXIMITY_SENSOR_NAME,
-		.vendor = "Sony",
+		.vendor = "Avago Technologies",
 		.version = sizeof(sensors_event_t),
 		.handle = SENSOR_PROXIMITY_HANDLE,
 		.type = SENSOR_TYPE_PROXIMITY,
