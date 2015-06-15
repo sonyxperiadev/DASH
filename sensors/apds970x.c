@@ -142,7 +142,7 @@ static int apds9700_init(struct sensor_api_t *s)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd;
 
-	/* check for availablity */
+	/* check for availability */
 	fd = open_input_dev_by_name(PROXIMITY_DEV_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
 		ALOGE("%s: unable to find %s input device!\n", __func__,
@@ -245,7 +245,6 @@ static void *apds9700_read(void *arg)
 		}
 	}
 
-exit:
 	return NULL;
 }
 
