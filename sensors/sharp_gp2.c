@@ -151,10 +151,6 @@ static void *sharp_read(void *arg)
 			data.timestamp = get_current_nano_time();
 
 			sensors_fifo_put(&data);
-
-			/* sleep for delay time */
-			sensors_nsleep(d->delay);
-
 			break;
 		default:
 			break;
