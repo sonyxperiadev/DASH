@@ -93,9 +93,16 @@ static int sharp_activate(struct sensor_api_t *s, int enable)
 				PROXIMITY_DEV_NAME);
 			return -1;
 		}
+#ifdef EVIOCSSUSPENDBLOCK
+		if (ioctl(fd, EVIOCSSUSPENDBLOCK, 1))
+			ALOGW("%s: unable to enable wake locks\n", __func__);
+#endif
 		d->select_worker.set_fd(&d->select_worker, fd);
 		d->select_worker.resume(&d->select_worker);
 	} else if (!enable && (fd > 0)) {
+#ifdef EVIOCSSUSPENDBLOCK
+		ioctl(fd, EVIOCSSUSPENDBLOCK, 0);
+#endif
 		d->select_worker.set_fd(&d->select_worker, -1);
 		d->select_worker.suspend(&d->select_worker);
 	}
