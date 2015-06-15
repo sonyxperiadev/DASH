@@ -54,7 +54,7 @@ static struct sensor_desc sharp_gp2 = {
 		.type = SENSOR_TYPE_PROXIMITY,
 		.maxRange = 1.0,
 		.resolution = 1.0,
-		.power = 20
+		.power = 0.75
 	},
 	.api = {
 		.init = sharp_init,
