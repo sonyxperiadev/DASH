@@ -39,7 +39,7 @@ static int64_t timespec_to_ns(const struct timespec *ts)
 int64_t get_current_nano_time()
 {
 	struct timespec t;
-	clock_gettime(CLOCK_MONOTONIC, &t);
+	clock_gettime(CLOCK_BOOTTIME, &t);
 	return timespec_to_ns(&t);
 }
 
