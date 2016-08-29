@@ -269,9 +269,8 @@ void *sensor_xyz_read(void *arg)
 
 	n = read(fd, events, sizeof(events));
 	if (n < 0) {
-		ALOGE("%s: read error '%s' from fd %d sensor '%s' built %s @ %s",
-			__func__, strerror(errno), fd, p->sensor.name,
-			__DATE__, __TIME__);
+		ALOGE("%s: read error '%s' from fd %d sensor '%s'",
+			__func__, strerror(errno), fd, p->sensor.name);
 		return NULL;
 	} else if (n == 0) {
 		ALOGE("%s: read error end of file from fd %d, sensor '%s'",
