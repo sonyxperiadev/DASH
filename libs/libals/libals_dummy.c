@@ -30,3 +30,13 @@ int als_available(void)
 {
     return 0;
 }
+
+int sysals_activate(void)
+{
+    return 0;
+}
+
+int sysals_deactivate(void)
+{
+    return 0;
+}
